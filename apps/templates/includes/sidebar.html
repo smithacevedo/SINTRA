@@ -15,6 +15,12 @@
               <p>Dashboard</p>
             </a>
           </li>
+          <li class="nav-item {% if 'productos' in segment %} active {% endif %}">
+            <a class="nav-link" href="{% url 'lista_productos' %}">
+              <i class="material-icons">category</i>
+              <p>Productos</p>
+            </a>
+          </li>
           <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
             <a class="nav-link" href="/page-user.html">
               <i class="material-icons">person</i>

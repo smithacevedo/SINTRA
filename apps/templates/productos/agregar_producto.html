@@ -1,0 +1,20 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Agregar Producto {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<h2>Agregar Producto</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+<button type="submit" class="btn btn-primary">Guardar</button>
+<a href="{% url 'lista_productos' %}" class="btn btn-secondary">Volver</a>
+{% endblock %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
