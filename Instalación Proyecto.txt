@@ -1,3 +1,4 @@
+
 # DOCUMENTACIÓN OFICIAL
 https://demos.creative-tim.com/argon-dashboard-django/docs/getting-started/getting-started-django.html?_ga=2.33541694.1858246354.1740671994-1663602739.1740245644
 
@@ -19,6 +20,7 @@ Vaya a la página de descarga oficial (https://git-scm.com/downloads)
 
 # Creamos el ambiente virtual:
 pip install virtualenv
+python -m virtualenv env
 virtualenv --no-site-packages env
 o virtualenv env
 
@@ -39,11 +41,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sintra',
         'USER': 'postgres',
-        'PASSWORD': '123',
+        'PASSWORD': 'D3v3l0pm3nt',
         'HOST': 'localhost',
         'PORT': 5432
     },
 }
+
+pip install psycopg2==2.9.10
+
 
 # Luego correr migraciones:
 python manage.py makemigrations

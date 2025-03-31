@@ -75,7 +75,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sintra',
         'USER': 'postgres',
-        'PASSWORD': '123',
+       'PASSWORD': 'D3v3l0pm3nt',
+        #'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': 5432
     },
