@@ -79,4 +79,6 @@ o docker-compose pull; docker-compose build; docker-compose up -d
 python manage.py startapp compras
 
 
-prueba de commit in
+# Correr las migraciones:
+python manage.py makemigrations
+python manage.py migrate
