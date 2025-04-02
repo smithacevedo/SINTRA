@@ -78,3 +78,7 @@ o docker-compose pull; docker-compose build; docker-compose up -d
 # Crear nuevas aplicaciones:
 python manage.py startapp compras
 
+
+# Correr las migraciones:
+python manage.py makemigrations
+python manage.py migrate
