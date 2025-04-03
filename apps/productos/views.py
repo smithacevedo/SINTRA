@@ -1,14 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, redirect
+from django.views import View
 from .models import Producto
 from .forms import ProductoForm
-from django import template
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.template import loader
-from django.urls import reverse
-from django.views import View
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.contrib import messages
 
 
 class ListaProductosView(ListView):
@@ -27,3 +23,32 @@ class AgregarProductoView(CreateView):
     form_class = ProductoForm
     template_name = 'productos/agregar_producto.html'
     success_url = reverse_lazy('lista_productos')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['segment'] = 'productos'
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'El producto ha sido agregado exitosamente.')
+        return super().form_valid(form)
+
+
+class EditarProductoView(UpdateView):
+    model = Producto
+    form_class = ProductoForm
+    template_name = 'productos/editar_producto.html'
+    success_url = reverse_lazy('lista_productos')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['segment'] = 'productos'
+        return context
+
+
+class EliminarProductoView(View):
+    def post(self, request, pk, *args, **kwargs):
+        producto = get_object_or_404(Producto, pk=pk)
+        producto.delete()
+        messages.success(request, f'El producto "{producto.referencia}" ha sido eliminado.')
+        return redirect('lista_productos')

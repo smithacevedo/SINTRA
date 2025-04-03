@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Agregar Producto {% endblock %}
+{% block title %} Editar Producto {% endblock %}
 
 {% block stylesheets %}
 <!-- Select2 CSS -->
@@ -22,8 +22,8 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title">Registrar Producto</h4>
-                <p class="card-category">Complete la información del producto</p>
+                <h4 class="card-title">Editar Producto</h4>
+                <p class="card-category">Modifique la información del producto</p>
             </div>
             <div class="card-body">
                 <form method="post">
@@ -32,13 +32,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Referencia</label>
-                                <input type="text" class="form-control" name="referencia">
+                                <input type="text" class="form-control" name="referencia" value="{{ form.referencia.value }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Artículo</label>
-                                <input type="text" class="form-control" name="articulo">
+                                <input type="text" class="form-control" name="articulo" value="{{ form.articulo.value }}">
                             </div>
                         </div>
                     </div>
@@ -46,13 +46,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Precio Costo</label>
-                                <input type="number" class="form-control" name="precio_costo">
+                                <input type="number" class="form-control" name="precio_costo" value="{{ form.precio_costo.value }}">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Precio Venta</label>
-                                <input type="number" class="form-control" name="precio_venta">
+                                <input type="number" class="form-control" name="precio_venta" value="{{ form.precio_venta.value }}">
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,9 @@
                                 <label class="bmd-label-floating">Línea</label>
                                 <select class="form-control select2" name="linea">
                                     {% for choice in form.linea.field.choices %}
-                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    <option value="{{ choice.0 }}" {% if choice.0 == form.linea.value %}selected{% endif %}>
+                                        {{ choice.1 }}
+                                    </option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -70,11 +72,11 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Descripción</label>
-                                <textarea class="form-control" name="descripcion" rows="3"></textarea>
+                                <textarea class="form-control" name="descripcion" rows="3">{{ form.descripcion.value }}</textarea>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary pull-right">Guardar</button>
+                    <button type="submit" class="btn btn-primary pull-right">Guardar Cambios</button>
                     <a href="{% url 'lista_productos' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
                     <div class="clearfix"></div>
                 </form>

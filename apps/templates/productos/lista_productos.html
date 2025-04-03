@@ -1,40 +1,95 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Lista Productos {% endblock %} 
+{% block title %} Lista Productos {% endblock %}
 
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock stylesheets %}
 
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">Lista de Productos</h2>
-    <div class="mb-3">
-        <a href="{% url 'agregar_producto' %}" class="btn btn-primary">Agregar Producto</a>
-    </div>
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Referencia</th>
-                <th>Precio</th>
-                <th>Descripción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.referencia }}</td>
-                <td>{{ producto.precio }}</td>
-                <td>{{ producto.descripcion }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="text-center">No hay productos disponibles.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% if messages %}
+<div class="alert alert-success" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
 </div>
-{% endblock %}
+{% endif %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-plain">
+            <div class="card-header card-header-primary d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="card-title mt-0">Lista de Productos</h4>
+                    <p class="card-category">Aquí puedes ver todos los productos registrados</p>
+                </div>
+                <a href="{% url 'agregar_producto' %}" class="btn btn-secondary">Agregar Producto</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-primary">
+                            <tr>
+                                <th>Referencia</th>
+                                <th>Artículo</th>
+                                <th>Precio Costo</th>
+                                <th>Precio Venta</th>
+                                <th>Línea</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto.referencia }}</td>
+                                <td>{{ producto.articulo }}</td>
+                                <td>{{ producto.precio_costo }}</td>
+                                <td>{{ producto.precio_venta }}</td>
+                                <td>{{ producto.linea }}</td>
+                                <td>{{ producto.descripcion }}</td>
+                                <td class="td-actions text-right">
+                                    <a href="{% url 'editar_producto' producto.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
+                                        <i class="material-icons">edit</i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.id }}">
+                                        <i class="material-icons">delete</i>
+                                    </button>
+                                </td>
 
-<!-- Specific Page JS goes HERE  -->
+                                <!-- Inicio modal de confirmación -->
+                                <div class="modal fade" id="confirmDeleteModal{{ producto.id }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ producto.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ producto.id }}">Confirmar Eliminación</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Estás seguro de que deseas eliminar el producto <strong>{{ producto.referencia }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form method="post" action="{% url 'eliminar_producto' producto.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Fin modal de confirmación -->
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No hay productos disponibles.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
 {% block javascripts %}{% endblock javascripts %}
