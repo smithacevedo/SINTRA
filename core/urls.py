@@ -13,8 +13,9 @@ urlpatterns = [
     path("", include("apps.authentication.urls")), # Auth routes - login / register
     path("", include("apps.home.urls")),             # UI Kits Html files
     path("productos/", include("apps.productos.urls")),
+    path("clientes/", include("apps.clientes.urls")),
 
     # Captura cualquier otro archivo HTML dentro de home (excluye las apps)
     #re_path(r'^(?!productos/|ventas/|clientes/).*\.html$', views.pages, name='pages'), CUANDO SEAN VARIOS
-    re_path(r'^(?!productos/).*\.html$', views.pages, name='pages'),
+    re_path(r'^(?!productos/|clientes/).*\.html$', views.pages, name='pages'),
 ]

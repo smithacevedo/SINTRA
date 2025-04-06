@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'apps.home',
     'apps.productos',
+    'apps.clientes',
 ]
 
 MIDDLEWARE = [
