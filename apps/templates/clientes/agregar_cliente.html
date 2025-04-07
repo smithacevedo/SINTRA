@@ -2,7 +2,20 @@
 
 {% block title %} Agregar Cliente {% endblock %}
 
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Estilos personalizados para Select2 -->
+<style>
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+    }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
 <div class="row">
@@ -22,6 +35,52 @@
                                 <input type="text" class="form-control" name="nombre_cliente" required>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Email Cliente / Proyecto (*)</label>
+                                <input type="text" class="form-control" name="email_cliente" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Nombre Contacto (*)</label>
+                                <input type="text" class="form-control" name="nombre_contacto" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Teléfono Contacto (*)</label>
+                                <input type="number" class="form-control" name="telefono_contacto" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Email Contacto (*)</label>
+                                <input type="text" class="form-control" name="email_contacto" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Dirección (*)</label>
+                                <input type="text" class="form-control" name="direccion_cliente" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Ciudad</label>
+                                <select class="form-control select2" name="ciudad_cliente">
+                                    {% for choice in form.ciudad_cliente.field.choices %}
+                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary pull-right">Guardar</button>
                     <a href="{% url 'lista_clientes' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
@@ -33,4 +92,17 @@
 </div>
 {% endblock %}
 
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Inicializar Select2 en el campo con la clase "select2"
+        $('.select2').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true
+        });
+    });
+</script>
+{% endblock javascripts %}

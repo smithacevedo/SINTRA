@@ -30,6 +30,11 @@
                         <thead class="text-primary">
                             <tr>
                                 <th>Nombre Cliente / Proyecto</th>
+                                <th>Contacto</th>
+                                <th>Teléfono Contacto</th>
+                                <th>Correo Contacto</th>
+                                <th>Dirección</th>
+                                <th>Ciudad</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -37,6 +42,11 @@
                             {% for cliente in clientes %}
                             <tr>
                                 <td>{{ cliente.nombre_cliente }}</td>
+                                <td>{{ cliente.nombre_contacto }}</td>
+                                <td>{{ cliente.telefono_contacto }}</td>
+                                <td>{{ cliente.email_contacto }}</td>
+                                <td>{{ cliente.direccion_cliente }}</td>
+                                <td>{{ cliente.ciudad_cliente }}</td>
                                 <td class="td-actions text-left">
                                     <a href="{% url 'editar_cliente' cliente.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
