@@ -1,0 +1,190 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Editar Orden de Compra {% endblock %}
+
+{% block stylesheets %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+    }
+    input[name$="-DELETE"] {
+        display: none !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Editar Orden de Compra</h4>
+                <p class="card-category">Modifique la información de la orden</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Cliente y Fecha -->
+                    <h5 class="mt-4 text-center text-uppercase">DATOS ORDEN</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Orden de compra #:</label>
+                                {{ form.codigo_oc }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fecha de Solicitud</label>
+                                {{ form.fecha_solicitud }}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Cliente / Proyecto</label>
+                                {{ form.cliente }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos -->
+                    <h5 class="mt-4 text-center text-uppercase">Artículos registrados en orden de compra</h5>
+                    {{ formset.management_form }}
+                    <div class="card-body" id="formset-container">
+                        {% for f in formset %}
+                        <div class="producto-form row mb-3 border p-3 rounded bg-light">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Producto</label>
+                                    {{ f.producto }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cantidad</label>
+                                    {{ f.cantidad }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    {{ f.descripcion }}
+                                </div>
+                            </div>
+                            {{ f.id }}
+                            {% if f.DELETE %}
+                                {{ f.DELETE }}
+                            {% endif %}
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-form">Eliminar item</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Template oculto -->
+                    <template id="empty-form">
+                        <div class="producto-form row mb-3 border p-3 rounded bg-light">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Producto</label>
+                                    {{ formset.empty_form.producto }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cantidad</label>
+                                    {{ formset.empty_form.cantidad }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    {{ formset.empty_form.descripcion }}
+                                </div>
+                            </div>
+                            {{ formset.empty_form.id }}
+                            {{ formset.empty_form.DELETE }}
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-form">Eliminar item</button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Botones -->
+                    <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-form">
+                        + Añadir Producto
+                    </button>
+                    <button type="submit" class="btn btn-primary pull-right">Guardar Cambios</button>
+                    <a href="{% url 'lista_ordenes_compra' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    function initializeSelect2(container = document) {
+        $(container).find('select.select2').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const totalForms = document.getElementById('id_productosolicitado_set-TOTAL_FORMS');
+        const formsetContainer = document.getElementById('formset-container');
+        const addFormBtn = document.getElementById('add-form');
+        const emptyFormTemplate = document.getElementById('empty-form');
+
+        initializeSelect2();
+
+        addFormBtn.addEventListener('click', function () {
+            const formCount = parseInt(totalForms.value);
+            const newForm = emptyFormTemplate.content.cloneNode(true);
+
+            const elements = newForm.querySelectorAll('*');
+            elements.forEach((el) => {
+                for (let attr of el.attributes || []) {
+                    if (attr.value.includes('__prefix__')) {
+                        el.setAttribute(attr.name, attr.value.replace(/__prefix__/g, formCount));
+                    }
+                }
+                if (el.innerHTML && el.innerHTML.includes('__prefix__')) {
+                    el.innerHTML = el.innerHTML.replace(/__prefix__/g, formCount);
+                }
+            });
+
+            formsetContainer.appendChild(newForm);
+            initializeSelect2(formsetContainer);
+            totalForms.value = formCount + 1;
+        });
+
+        formsetContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-form')) {
+                const form = e.target.closest('.producto-form');
+                const deleteInput = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                if (deleteInput) {
+                    deleteInput.checked = true;
+                    form.style.display = 'none';
+                } else {
+                    form.remove();
+                }
+            }
+        });
+    });
+</script>
+{% endblock javascripts %}

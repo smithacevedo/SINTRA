@@ -28,10 +28,10 @@
           <p>Clientes / Proyectos</p>
         </a>
       </li>
-      <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
-        <a class="nav-link" href="/page-user.html">
-          <i class="material-icons">person</i>
-          <p>User Profile</p>
+      <li class="nav-item {% if 'ordenes' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_ordenes_compra' %}">
+          <i class="material-icons">shopping_bag</i>
+          <p>Órdenes De Compra</p>
         </a>
       </li>
       <li class="nav-item {% if 'ui-tables' in segment %} active {% endif %}">

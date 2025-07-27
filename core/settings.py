@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.productos',
     'apps.clientes',
     'cities_light',
+    'apps.ordenes_compra',
 ]
 
 MIDDLEWARE = [

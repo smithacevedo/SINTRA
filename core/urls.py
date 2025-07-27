@@ -14,6 +14,7 @@ urlpatterns = [
     path("", include("apps.home.urls")),             # UI Kits Html files
     path("productos/", include("apps.productos.urls")),
     path("clientes/", include("apps.clientes.urls")),
+    path("ordenes_compra/", include("apps.ordenes_compra.urls")),
 
     # Captura cualquier otro archivo HTML dentro de home (excluye las apps)
     #re_path(r'^(?!productos/|ventas/|clientes/).*\.html$', views.pages, name='pages'), CUANDO SEAN VARIOS
