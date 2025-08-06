@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'apps.clientes',
     'cities_light',
     'apps.ordenes_compra',
+    'apps.proveedores',
+
 ]
 
 MIDDLEWARE = [
