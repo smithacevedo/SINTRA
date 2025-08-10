@@ -44,6 +44,11 @@ class EditarClienteView(UpdateView):
         context['segment'] = 'clientes'
         return context
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'El cliente "{form.instance.nombre_cliente}" ha sido actualizado exitosamente.')
+        return response
+
 
 class EliminarClienteView(View):
     def post(self, request, pk, *args, **kwargs):

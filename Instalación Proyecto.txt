@@ -82,3 +82,12 @@ python manage.py startapp compras
 # Correr las migraciones:
 python manage.py makemigrations
 python manage.py migrate
+
+-------------------------------------------------
+
+Para notificaciones personalizadas hay estos tipos de mensajes:
+
+messages.success(request, 'Mensaje de éxito')     # Notificación verde
+messages.error(request, 'Mensaje de error')       # Notificación roja
+messages.warning(request, 'Mensaje de advertencia') # Notificación amarilla
+messages.info(request, 'Mensaje informativo')     # Notificación azul
