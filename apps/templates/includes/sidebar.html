@@ -1,9 +1,7 @@
 <div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
   <div class="logo">
-    <h2>
-      <center>
-      SINTRA
-    </center>
+    <h2 class="simple-text logo-normal">
+      <img src="/static/assets/img/apple-icon.png" width="64" height="64"> 
     </h2>
   </div>
   <div class="sidebar-wrapper">
@@ -34,10 +32,10 @@
           <p>Órdenes De Compra</p>
         </a>
       </li>
-      <li class="nav-item {% if 'ui-tables' in segment %} active {% endif %}">
-        <a class="nav-link" href="/ui-tables.html">
-          <i class="material-icons">content_paste</i>
-          <p>Table List</p>
+      <li class="nav-item {% if 'proveedores' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_proveedores' %}">
+          <i class="material-icons">local_shipping</i>
+          <p>Proveedores</p>
         </a>
       </li>
       <li class="nav-item {% if 'ui-typography' in segment %} active {% endif %}">

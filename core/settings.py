@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'apps.clientes',
     'cities_light',
     'apps.ordenes_compra',
+    'apps.proveedores',
+
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
+
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -82,8 +88,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sintra',
         'USER': 'postgres',
-       #'PASSWORD': 'D3v3l0pm3nt',
-        'PASSWORD': '123',
+       'PASSWORD': 'D3v3l0pm3nt',
+        #'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': 5432
     },
@@ -110,9 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
