@@ -45,6 +45,10 @@ class EditarProductoView(UpdateView):
         context['segment'] = 'productos'
         return context
 
+    def form_valid(self, form):
+        messages.success(self.request, 'El producto ha sido actualizado exitosamente.')
+        return super().form_valid(form)
+
 
 class EliminarProductoView(View):
     def post(self, request, pk, *args, **kwargs):
