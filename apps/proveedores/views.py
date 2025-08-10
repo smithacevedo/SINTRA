@@ -45,6 +45,10 @@ class EditarproveedoresView(UpdateView):
         context['segment'] = 'proveedores'
         return context
 
+    def form_valid(self, form):
+        messages.success(self.request, 'El proveedor ha sido actualizado exitosamente.')
+        return super().form_valid(form)
+
 
 class EliminarproveedoresView(View):
     def post(self, request, pk, *args, **kwargs):
