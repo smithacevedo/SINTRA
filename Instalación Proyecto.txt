@@ -91,3 +91,14 @@ messages.success(request, 'Mensaje de éxito')     # Notificación verde
 messages.error(request, 'Mensaje de error')       # Notificación roja
 messages.warning(request, 'Mensaje de advertencia') # Notificación amarilla
 messages.info(request, 'Mensaje informativo')     # Notificación azul
+
+
+-------------------------------------------------
+
+Si hay errores en migraciones, ejecutar:
+
+python clear_migrations.py
+
+Y ahí si ejecutar:
+python manage.py makemigrations
+python manage.py migrate --fake-initial
