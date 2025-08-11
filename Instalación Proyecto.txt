@@ -99,6 +99,15 @@ Si hay errores en migraciones, ejecutar:
 
 python clear_migrations.py
 
+Marcar las migraciones de cities_light como hechas (sin ejecutarlas):
+
+python manage.py migrate cities_light --fake
+
 Y ahí si ejecutar:
 python manage.py makemigrations
-python manage.py migrate --fake-initial
+python manage.py migrate
+
+
+En caso de otros errores de librerías:
+
+pip install --force-reinstall -r requirements.txt
