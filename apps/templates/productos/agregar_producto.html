@@ -33,7 +33,7 @@
         <div class="card">
             <div class="card-header card-header-primary">
                 <h4 class="card-title">Registrar Producto</h4>
-                <p class="card-category">Complete la información del producto</p>
+                <p class="card-category">Los campos con <span style="color: red;">(*)</span> son obligatorios</p>
             </div>
             <div class="card-body">
                 <form method="post">
@@ -41,36 +41,36 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Referencia</label>
-                                <input type="text" class="form-control" name="referencia">
+                                <label class="bmd-label-floating">Referencia <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="referencia" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Artículo</label>
-                                <input type="text" class="form-control" name="articulo">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="bmd-label-floating">Precio Costo</label>
-                                <input type="number" class="form-control" name="precio_costo">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="bmd-label-floating">Precio Venta</label>
-                                <input type="number" class="form-control" name="precio_venta">
+                                <label class="bmd-label-floating">Artículo <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="articulo" required>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Línea</label>
-                                <select class="form-control select2" name="linea">
+                                <label class="bmd-label-floating">Precio Costo <span style="color: red;">(*)</span></label>
+                                <input type="number" class="form-control" name="precio_costo" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Precio Venta <span style="color: red;">(*)</span></label>
+                                <input type="number" class="form-control" name="precio_venta" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Línea <span style="color: red;">(*)</span></label>
+                                <select class="form-control select2" name="linea" required>
                                     {% for choice in form.linea.field.choices %}
                                     <option value="{{ choice.0 }}">{{ choice.1 }}</option>
                                     {% endfor %}
@@ -79,8 +79,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Descripción</label>
-                                <textarea class="form-control" name="descripcion" rows="3"></textarea>
+                                <label class="bmd-label-floating">Descripción <span style="color: red;">(*)</span></label>
+                                <textarea class="form-control" name="descripcion" rows="3" required></textarea>
                             </div>
                         </div>
                     </div>
