@@ -38,52 +38,65 @@
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
+
+                    {{ form.non_field_errors }}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Referencia <span style="color: red;">(*)</span></label>
-                                <input type="text" class="form-control" name="referencia" required>
+                                <input type="text" class="form-control" name="referencia" value="{{ form.referencia.value|default_if_none:'' }}" required>
+                                {% for error in form.referencia.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Artículo <span style="color: red;">(*)</span></label>
-                                <input type="text" class="form-control" name="articulo" required>
+                                <input type="text" class="form-control" name="articulo" value="{{ form.articulo.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Precio Costo <span style="color: red;">(*)</span></label>
-                                <input type="number" class="form-control" name="precio_costo" required>
+                                <input type="number" class="form-control" name="precio_costo" value="{{ form.precio_costo.value|default_if_none:'' }}" required>
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Precio Venta <span style="color: red;">(*)</span></label>
-                                <input type="number" class="form-control" name="precio_venta" required>
+                                <input type="number" class="form-control" name="precio_venta" value="{{ form.precio_venta.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Línea <span style="color: red;">(*)</span></label>
                                 <select class="form-control select2" name="linea" required>
                                     {% for choice in form.linea.field.choices %}
-                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    <option value="{{ choice.0 }}" {% if choice.0 == form.linea.value %}selected{% endif %}>
+                                        {{ choice.1 }}
+                                    </option>
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Descripción <span style="color: red;">(*)</span></label>
-                                <textarea class="form-control" name="descripcion" rows="3" required></textarea>
+                                <textarea class="form-control" name="descripcion" rows="3" required>{{ form.descripcion.value|default_if_none:'' }}</textarea>
                             </div>
                         </div>
                     </div>
+
                     <button type="submit" class="btn btn-primary pull-right">Guardar</button>
                     <a href="{% url 'lista_productos' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
                     <div class="clearfix"></div>
