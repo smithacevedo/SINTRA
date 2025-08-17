@@ -38,16 +38,18 @@
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
+
+                    {{ form.non_field_errors }}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Cliente / Proyecto (*)</label>
+                                <label class="bmd-label-floating">Nombre Cliente / Proyecto <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="nombre_cliente" value="{{ form.nombre_cliente.value }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Cliente (*)</label>
+                                <label class="bmd-label-floating">Email Cliente <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="email_cliente" value="{{ form.email_cliente.value }}" required>
                             </div>
                         </div>
@@ -55,13 +57,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Contacto (*)</label>
+                                <label class="bmd-label-floating">Nombre Contacto <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="nombre_contacto" value="{{ form.nombre_contacto.value }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Teléfono Contacto (*)</label>
+                                <label class="bmd-label-floating">Teléfono Contacto <span style="color: red;">(*)</span></label>
                                 <input type="number" class="form-control" name="telefono_contacto" value="{{ form.telefono_contacto.value }}" required>
                             </div>
                         </div>
@@ -69,20 +71,20 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Contacto (*)</label>
+                                <label class="bmd-label-floating">Email Contacto <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="email_contacto" value="{{ form.email_contacto.value }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Dirección (*)</label>
+                                <label class="bmd-label-floating">Dirección <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="direccion_cliente" value="{{ form.direccion_cliente.value }}" required>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="bmd-label-floating">Ciudad</label>
+                            <label class="bmd-label-floating">Ciudad <span style="color: red;">(*)</span></label>
                             <select class="form-control select2" name="ciudad_cliente">
                                 {% for choice in form.ciudad_cliente.field.choices %}
                                 <option value="{{ choice.0 }}" {% if choice.0 == form.ciudad_cliente.value %}selected{% endif %}>

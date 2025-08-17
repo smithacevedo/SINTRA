@@ -34,6 +34,7 @@
                         <thead class="text-primary">
                             <tr>
                                 <th>Nombre Cliente / Proyecto</th>
+                                <th>Correo Cliente</th>
                                 <th>Contacto</th>
                                 <th>Teléfono Contacto</th>
                                 <th>Correo Contacto</th>
@@ -46,6 +47,7 @@
                             {% for cliente in clientes %}
                             <tr>
                                 <td>{{ cliente.nombre_cliente }}</td>
+                                <td>{{ cliente.email_cliente }}</td>
                                 <td>{{ cliente.nombre_contacto }}</td>
                                 <td>{{ cliente.telefono_contacto }}</td>
                                 <td>{{ cliente.email_contacto }}</td>

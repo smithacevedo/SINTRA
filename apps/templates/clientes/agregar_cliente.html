@@ -34,60 +34,65 @@
         <div class="card">
             <div class="card-header card-header-primary">
                 <h4 class="card-title">Registrar Cliente</h4>
-                <p class="card-category">Complete la información del cliente</p>
+                <p class="card-category">Los campos con <span style="color: red;">(*)</span> son obligatorios</p>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
+
+                    {{ form.non_field_errors }}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Cliente / Proyecto (*)</label>
-                                <input type="text" class="form-control" name="nombre_cliente" required>
+                                <label class="bmd-label-floating">Nombre Cliente / Proyecto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="nombre_cliente" value="{{ form.nombre_cliente.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Cliente / Proyecto (*)</label>
-                                <input type="text" class="form-control" name="email_cliente" required>
+                                <label class="bmd-label-floating">Email Cliente / Proyecto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="email_cliente" value="{{ form.email_cliente.value|default_if_none:'' }}" required>
+                                {% for error in form.email_cliente.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Contacto (*)</label>
-                                <input type="text" class="form-control" name="nombre_contacto" required>
+                                <label class="bmd-label-floating">Nombre Contacto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="nombre_contacto" value="{{ form.nombre_contacto.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Teléfono Contacto (*)</label>
-                                <input type="number" class="form-control" name="telefono_contacto" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="bmd-label-floating">Email Contacto (*)</label>
-                                <input type="text" class="form-control" name="email_contacto" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="bmd-label-floating">Dirección (*)</label>
-                                <input type="text" class="form-control" name="direccion_cliente" required>
+                                <label class="bmd-label-floating">Teléfono Contacto <span style="color: red;">(*)</span></label>
+                                <input type="number" class="form-control" name="telefono_contacto" value="{{ form.telefono_contacto.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Ciudad</label>
-                                <select class="form-control select2" name="ciudad_cliente">
+                                <label class="bmd-label-floating">Email Contacto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="email_contacto" value="{{ form.email_contacto.value|default_if_none:'' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Dirección <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="direccion_cliente" value="{{ form.direccion_cliente.value|default_if_none:'' }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Ciudad <span style="color: red;">(*)</span></label>
+                                <select class="form-control select2" name="ciudad_cliente" value="{{ form.ciudad_cliente.value|default_if_none:'' }}">
                                     {% for choice in form.ciudad_cliente.field.choices %}
-                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    <option value="{{ choice.0 }}" {% if choice.0 == form.ciudad_cliente.value %}selected{% endif %}>{{ choice.1 }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
