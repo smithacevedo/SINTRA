@@ -47,11 +47,12 @@ class AgregarOrdenCompraView(CreateView):
             messages.success(request, 'La orden de compra ha sido registrada exitosamente.')
             return redirect(self.success_url)
 
+        messages.error(request, 'Por favor, corrija los errores en el formulario.')
         return render(request, self.template_name, {
             'form': form,
             'formset': formset,
             'segment': 'ordenes'
-        })
+        }, status=400)
 
 
 class EditarOrdenCompraView(UpdateView):
@@ -79,13 +80,16 @@ class EditarOrdenCompraView(UpdateView):
     def form_valid(self, form):
         context = self.get_context_data()
         formset = context['formset']
-        if form.is_valid() and formset.is_valid():
+        if formset.is_valid():
             self.object = form.save()
             formset.instance = self.object
             formset.save()
             messages.success(self.request, 'La orden de compra ha sido actualizada correctamente.')
             return redirect(self.success_url)
-        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Por favor, corrija los errores en el formulario.')
+        return self.render_to_response(self.get_context_data(form=form), status=400)
 
 
 class EliminarOrdenCompraView(View):

@@ -41,24 +41,29 @@
                 <form method="post">
                     {% csrf_token %}
 
+                    {{ form.non_field_errors }}
+
                     <!-- Cliente y Fecha -->
                     <h5 class="mt-4 text-center text-uppercase">DATOS ORDEN</h5>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Orden de compra #:</label>
-                                {{ form.codigo_oc }}
+                                <label class="bmd-label-floating"># Orden Compra <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="codigo_oc" value="{{ form.codigo_oc.value|default_if_none:'' }}" required>
                             </div>
+                            {% for error in form.codigo_oc.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Fecha de Solicitud</label>
+                                <label>Fecha de Solicitud <span style="color: red;">(*)</span></label>
                                 {{ form.fecha_solicitud }}
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Cliente / Proyecto</label>
+                                <label>Cliente / Proyecto <span style="color: red;">(*)</span></label>
                                 {{ form.cliente }}
                             </div>
                         </div>
@@ -66,25 +71,30 @@
 
                     <!-- Productos -->
                     <h5 class="mt-4 text-center text-uppercase">Artículos registrados en orden de compra</h5>
+
+                    <div class="col-md-12">
+                        <small class="text-muted"><strong>Nota:</strong> Se debe registrar al menos un artículo.</small>
+                    </div>
+
                     {{ formset.management_form }}
                     <div class="card-body" id="formset-container">
                         {% for f in formset %}
                         <div class="producto-form row mb-3 border p-3 rounded bg-light">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Producto</label>
+                                    <label>Producto <span style="color: red;">(*)</span></label>
                                     {{ f.producto }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Cantidad</label>
+                                    <label>Cantidad <span style="color: red;">(*)</span></label>
                                     {{ f.cantidad }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Descripción</label>
+                                    <label>Descripción <span style="color: red;">(*)</span></label>
                                     {{ f.descripcion }}
                                 </div>
                             </div>
@@ -92,9 +102,11 @@
                             {% if f.DELETE %}
                                 {{ f.DELETE }}
                             {% endif %}
+                            {% if forloop.counter > 1 %}
                             <div class="col-md-1 d-flex align-items-end">
                                 <button type="button" class="btn btn-danger btn-sm remove-form">Eliminar item</button>
                             </div>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -160,16 +172,60 @@
         const addFormBtn = document.getElementById('add-form');
         const emptyFormTemplate = document.getElementById('empty-form');
 
+        const initialFormCount = parseInt(totalForms.value, 10);
+
         initializeSelect2();
 
+        function disableFormInputs(form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (!el.name) return;
+                if (/-DELETE$/.test(el.name) || /-id$/.test(el.name)) return;
+                if ($(el).hasClass('select2')) {
+                    try { $(el).select2('destroy'); } catch (e) { /* ignore */ }
+                }
+                el.disabled = true;
+                el.removeAttribute('required');
+            });
+        }
+
+        function reindexNewForms() {
+            const allForms = Array.from(formsetContainer.querySelectorAll('.producto-form'));
+            const newForms = [];
+
+            allForms.forEach(form => {
+                const firstNamed = form.querySelector('[name]');
+                if (!firstNamed) return;
+                const m = firstNamed.name.match(/-(\d+)-/);
+                if (!m) return;
+                const idx = parseInt(m[1], 10);
+                if (idx >= initialFormCount) newForms.push({ form, oldIndex: idx });
+            });
+
+            newForms.forEach((entry, i) => {
+                const newIndex = initialFormCount + i;
+                const form = entry.form;
+                form.querySelectorAll('[name]').forEach(el => {
+                    el.name = el.name.replace(/-(\d+)-/, `-${newIndex}-`);
+                });
+                form.querySelectorAll('[id]').forEach(el => {
+                    el.id = el.id.replace(/-(\d+)-/, `-${newIndex}-`);
+                });
+                form.querySelectorAll('label[for]').forEach(lb => {
+                    lb.htmlFor = lb.htmlFor.replace(/-(\d+)-/, `-${newIndex}-`);
+                });
+            });
+
+            totalForms.value = initialFormCount + newForms.length;
+        }
+
         addFormBtn.addEventListener('click', function () {
-            const formCount = parseInt(totalForms.value);
+            const formCount = parseInt(totalForms.value, 10);
             const newForm = emptyFormTemplate.content.cloneNode(true);
 
             const elements = newForm.querySelectorAll('*');
             elements.forEach((el) => {
                 for (let attr of el.attributes || []) {
-                    if (attr.value.includes('__prefix__')) {
+                    if (attr.value && attr.value.includes('__prefix__')) {
                         el.setAttribute(attr.name, attr.value.replace(/__prefix__/g, formCount));
                     }
                 }
@@ -187,14 +243,18 @@
             if (e.target.classList.contains('remove-form')) {
                 const form = e.target.closest('.producto-form');
                 const deleteInput = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
+
                 if (deleteInput) {
                     deleteInput.checked = true;
+                    disableFormInputs(form);
                     form.style.display = 'none';
                 } else {
                     form.remove();
+                    reindexNewForms();
                 }
             }
         });
     });
 </script>
+
 {% endblock javascripts %}

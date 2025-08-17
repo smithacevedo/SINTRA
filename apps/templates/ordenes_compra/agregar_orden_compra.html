@@ -33,30 +33,35 @@
         <div class="card">
             <div class="card-header card-header-primary">
                 <h4 class="card-title">Registrar Orden de Compra</h4>
-                <p class="card-category">Complete la información de la orden</p>
+                <p class="card-category">Los campos con <span style="color: red;">(*)</span> son obligatorios</p>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
+
+                    {{ form.non_field_errors }}
 
                     <!-- Cliente y Fecha -->
                      <h5 class="mt-4 text-center text-uppercase">DATOS ORDEN</h5>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Orden de compra #:</label>
-                                {{ form.codigo_oc }}
+                                <label class="bmd-label-floating"># Orden Compra <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="codigo_oc" value="{{ form.codigo_oc.value|default_if_none:'' }}" required>
                             </div>
+                            {% for error in form.codigo_oc.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Fecha de Solicitud</label>
+                                <label class="bmd-label-floating">Fecha de Solicitud <span style="color: red;">(*)</span></label>
                                 {{ form.fecha_solicitud }}
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label>Cliente / Proyecto</label>
+                                <label class="bmd-label-floating">Cliente / Proyecto <span style="color: red;">(*)</span></label>
                                 {{ form.cliente }}
                             </div>
                         </div>
@@ -64,31 +69,38 @@
 
                     <!-- Productos -->
                     <h5 class="mt-4 text-center text-uppercase">Artículos registrados en orden de compra</h5>
+
+                    <div class="col-md-12">
+                        <small class="text-muted"><strong>Nota:</strong> Se debe registrar al menos un artículo.</small>
+                    </div>
+
                     {{ formset.management_form }}
                     <div class="card-body" id="formset-container">
                         {% for f in formset %}
                         <div class="producto-form row mb-3 border p-3 rounded bg-light">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Producto</label>
+                                    <label>Producto <span style="color: red;">(*)</span></label>
                                     {{ f.producto }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Cantidad</label>
+                                    <label>Cantidad <span style="color: red;">(*)</span></label>
                                     {{ f.cantidad }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Descripción</label>
+                                    <label>Descripción <span style="color: red;">(*)</span></label>
                                     {{ f.descripcion }}
                                 </div>
                             </div>
+                            {% if forloop.counter > 1 %}
                             <div class="col-md-1 d-flex align-items-end">
                                 <button type="button" class="btn btn-danger btn-sm remove-form">Eliminar item</button>
                             </div>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -98,19 +110,19 @@
                         <div class="producto-form row mb-3 border p-3 rounded bg-light">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Producto</label>
+                                    <label class="bmd-label-floating">Producto <span style="color: red;">(*)</span></label>
                                     {{ formset.empty_form.producto}}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Cantidad</label>
+                                    <label class="bmd-label-floating">Cantidad <span style="color: red;">(*)</span></label>
                                     {{ formset.empty_form.cantidad }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Descripción</label>
+                                    <label class="bmd-label-floating">Descripción <span style="color: red;">(*)</span></label>
                                     {{ formset.empty_form.descripcion }}
                                 </div>
                             </div>
@@ -155,29 +167,25 @@
         const addFormBtn = document.getElementById('add-form');
         const emptyFormTemplate = document.getElementById('empty-form');
 
-        // Inicializa Select2 en los formularios ya renderizados al cargar la página
+
         initializeSelect2();
 
         addFormBtn.addEventListener('click', function () {
             const formCount = parseInt(totalForms.value);
             const newForm = emptyFormTemplate.content.cloneNode(true);
 
-            // Reemplaza __prefix__ por el número correcto en todos los atributos y textos
             const elements = newForm.querySelectorAll('*');
             elements.forEach((el) => {
-                // Reemplaza en atributos (como name, id, for)
                 for (let attr of el.attributes || []) {
                     if (attr.value.includes('__prefix__')) {
                         el.setAttribute(attr.name, attr.value.replace(/__prefix__/g, formCount));
                     }
                 }
-                // Reemplaza también en innerHTML si contiene __prefix__
                 if (el.innerHTML && el.innerHTML.includes('__prefix__')) {
                     el.innerHTML = el.innerHTML.replace(/__prefix__/g, formCount);
                 }
             });
 
-            // Agrega el formulario al contenedor y actualiza el total
             formsetContainer.appendChild(newForm);
             initializeSelect2(formsetContainer);
             totalForms.value = formCount + 1;
