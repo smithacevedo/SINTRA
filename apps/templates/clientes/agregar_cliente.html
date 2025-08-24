@@ -44,13 +44,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Cliente / Proyecto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Nombre Cliente <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="nombre_cliente" value="{{ form.nombre_cliente.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Cliente / Proyecto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Email Cliente <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="email_cliente" value="{{ form.email_cliente.value|default_if_none:'' }}" required>
                                 {% for error in form.email_cliente.errors %}
                                     <div class="text-danger">{{ error }}</div>
