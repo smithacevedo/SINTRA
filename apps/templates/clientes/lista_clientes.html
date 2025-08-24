@@ -40,6 +40,7 @@
                                 <th>Correo Contacto</th>
                                 <th>Dirección</th>
                                 <th>Ciudad</th>
+                                <th>Tiene Proyectos</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -53,6 +54,7 @@
                                 <td>{{ cliente.email_contacto }}</td>
                                 <td>{{ cliente.direccion_cliente }}</td>
                                 <td>{{ cliente.ciudad_cliente }}</td>
+                                <td>{% if cliente.tiene_proyectos %}Sí{% else %}No{% endif %}</td>
                                 <td class="td-actions text-left">
                                     <a href="{% url 'editar_cliente' cliente.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
