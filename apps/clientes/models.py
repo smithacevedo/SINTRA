@@ -10,6 +10,7 @@ class Clientes(models.Model):
     email_contacto = models.EmailField(max_length=255, blank=True, null=True)
     direccion_cliente = models.CharField(max_length=255, blank=True, null=True)
     ciudad_cliente = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, null=True)
+    tiene_proyectos = models.BooleanField(default=False)
 
     def __str__(self):
         return self.nombre_cliente

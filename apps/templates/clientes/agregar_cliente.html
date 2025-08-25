@@ -44,13 +44,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Cliente / Proyecto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Nombre Cliente <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="nombre_cliente" value="{{ form.nombre_cliente.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Cliente / Proyecto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Email Cliente <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="email_cliente" value="{{ form.email_cliente.value|default_if_none:'' }}" required>
                                 {% for error in form.email_cliente.errors %}
                                     <div class="text-danger">{{ error }}</div>
@@ -95,6 +95,17 @@
                                     <option value="{{ choice.0 }}" {% if choice.0 == form.ciudad_cliente.value %}selected{% endif %}>{{ choice.1 }}</option>
                                     {% endfor %}
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check" style="margin-top: 3rem;">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="checkbox" name="tiene_proyectos" value="1" {% if form.tiene_proyectos.value %}checked{% endif %}>
+                                    <span class="form-check-sign">
+                                        <span class="check"></span>
+                                    </span>
+                                    <td>¿Tiene proyectos este cliente?</td>
+                                </label>
                             </div>
                         </div>
                     </div>
