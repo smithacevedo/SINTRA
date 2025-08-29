@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'cities_light',
     'apps.ordenes_compra',
     'apps.proveedores',
+    'apps.detalles_orden',
 
 ]
 
