@@ -32,6 +32,10 @@ class AgregarproveedoresView(CreateView):
     def form_valid(self, form):
         messages.success(self.request, 'El proveedores ha sido agregado exitosamente.')
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Por favor, corrija los errores en el formulario.')
+        return super().form_invalid(form)
 
 
 class EditarproveedoresView(UpdateView):
@@ -48,6 +52,10 @@ class EditarproveedoresView(UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'El proveedor ha sido actualizado exitosamente.')
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Por favor, corrija los errores en el formulario.')
+        return super().form_invalid(form)
 
 
 class EliminarproveedoresView(View):

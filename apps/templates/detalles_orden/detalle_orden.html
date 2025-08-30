@@ -1,0 +1,95 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Detalle de Orden {% endblock %}
+
+{% block stylesheets %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Detalle de Orden #{{ orden.id }}</h4>
+                <p class="card-category">Cliente: {{ orden.cliente.nombre }}</p>
+            </div>
+            <div class="card-body">
+                <h5>Productos en la Orden:</h5>
+                {% if detalles %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in detalles %}
+                                <tr>
+                                    <td>{{ detalle.producto.nombre }}</td>
+                                    <td>{{ detalle.cantidad }}</td>
+                                    <td>
+                                        {% if detalle.despachado %}
+                                            <span class="badge badge-success">Despachado</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">Pendiente</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No hay productos en esta orden aún.</p>
+                {% endif %}
+
+                <hr>
+
+                <h5>Agregar Nuevo Producto:</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Producto</label>
+                                {{ form.producto }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Cantidad</label>
+                                {{ form.cantidad }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary pull-right">Agregar Producto</button>
+                    <a href="{% url 'listar_ordenes' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $('.select2').select2({
+            placeholder: "Seleccione un producto",
+            allowClear: true
+        });
+    });
+</script>
+{% endblock javascripts %}

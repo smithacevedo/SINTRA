@@ -44,7 +44,12 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">NIT</label>
-                                <input type="text" class="form-control" name="nit" value="{{ form.nit.value|default_if_none:'' }}">
+                                <input type="text" class="form-control" name="nit" value="{{ form.nit.value|default_if_none:'' }}" required>
+                                 {% if form.nit.errors %}
+                                <div class="text-danger">
+                                    {{ form.nit.errors.0 }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -53,7 +58,12 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Teléfono</label>
-                                <input type="text" class="form-control" name="telefono" value="{{ form.telefono.value|default_if_none:'' }}">
+                                <input type="text" class="form-control" name="telefono" value="{{ form.telefono.value|default_if_none:'' }}" required>
+                                {% if form.telefono.errors %}
+                                <div class="text-danger">
+                                    {{ form.telefono.errors.0 }}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6">
