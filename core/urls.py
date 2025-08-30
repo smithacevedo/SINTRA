@@ -16,6 +16,7 @@ urlpatterns = [
     path("clientes/", include("apps.clientes.urls")),
     path("ordenes_compra/", include("apps.ordenes_compra.urls")),
     path("proveedores/", include("apps.proveedores.urls")),
+    path("proyectos/", include("apps.proyectos.urls")),
 
 
     # Captura cualquier otro archivo HTML dentro de home (excluye las apps)
