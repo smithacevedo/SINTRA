@@ -111,3 +111,7 @@ python manage.py migrate
 En caso de otros errores de librerías:
 
 pip install --force-reinstall -r requirements.txt
+
+
+# En caso de no cargar información de cities_light en la bd correr:
+python manage.py cities_light --force-import-all --progress
