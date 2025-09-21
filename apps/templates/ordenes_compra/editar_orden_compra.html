@@ -41,6 +41,8 @@
                 <form method="post">
                     {% csrf_token %}
 
+                    {{ clientes_flags|json_script:"clientesFlags" }}
+                    {{ proyectos_by_cliente|json_script:"proyectosByCliente" }}
                     {{ form.non_field_errors }}
 
                     <!-- Cliente y Fecha -->
@@ -61,10 +63,16 @@
                                 {{ form.fecha_solicitud }}
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Cliente <span style="color: red;">(*)</span></label>
                                 {{ form.cliente }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Proyecto <span id="proyecto-required-star" style="color: red; display: none;">(*)</span></label>
+                                {{ form.proyecto }}
                             </div>
                         </div>
                     </div>
@@ -166,6 +174,90 @@
         });
     }
 
+    let clientesFlags = {};
+    try {
+        const el = document.getElementById('clientesFlags');
+        if (el && el.textContent) clientesFlags = JSON.parse(el.textContent);
+    } catch (e) {
+        console.error('Error parseando clientesFlags en editar:', e);
+        clientesFlags = {};
+    }
+
+    function toggleProyectoCampo() {
+        const clienteSelect = document.querySelector('select[name="cliente"], input[name="cliente"]');
+        const proyectoField = document.querySelector('select[name="proyecto"], input[name="proyecto"]');
+        if (!clienteSelect || !proyectoField) return;
+
+        const star = document.getElementById('proyecto-required-star');
+
+        const clienteId = (window.jQuery && $(clienteSelect).hasClass('select2')) ? $(clienteSelect).val() : clienteSelect.value;
+
+        const tiene = clientesFlags && (clientesFlags[clienteId] === true || clientesFlags[clienteId] === 'True' || clientesFlags[clienteId] === 'true');
+
+        if (star) star.style.display = tiene ? 'inline' : 'none';
+
+        if (window.jQuery && $(proyectoField).hasClass('select2')) {
+            if (tiene) {
+                $(proyectoField).prop('disabled', false).prop('required', true).attr('required', 'required').trigger('change.select2');
+                $(proyectoField).closest('.select2-container').removeClass('disabled');
+            } else {
+                $(proyectoField).prop('disabled', true).prop('required', false).removeAttr('required').val(null).trigger('change');
+                $(proyectoField).closest('.select2-container').addClass('disabled');
+            }
+        } else {
+            if (tiene) {
+                proyectoField.disabled = false;
+                proyectoField.required = true;
+            } else {
+                proyectoField.disabled = true;
+                try { proyectoField.removeAttribute('required'); } catch (e) {}
+                if (proyectoField.tagName.toLowerCase() === 'select') proyectoField.value = '';
+                else proyectoField.value = '';
+            }
+        }
+
+        console.debug('editar toggleProyectoCampo:', { clienteId, tiene });
+    }
+
+    function poblarProyectosEditar(clienteId) {
+        let proyectos = {};
+        try {
+            const el = document.getElementById('proyectosByCliente');
+            if (el && el.textContent) proyectos = JSON.parse(el.textContent);
+        } catch (e) {
+            console.error('Error parseando proyectosByCliente en editar:', e);
+            proyectos = {};
+        }
+        const lista = proyectos[clienteId] || [];
+        const proyectoSelect = document.querySelector('select[name="proyecto"]');
+        if (!proyectoSelect) return;
+        const currentSelected = (window.jQuery && $(proyectoSelect).hasClass('select2')) ? $(proyectoSelect).val() : proyectoSelect.value;
+
+        while (proyectoSelect.firstChild) proyectoSelect.removeChild(proyectoSelect.firstChild);
+        const emptyOpt = document.createElement('option'); emptyOpt.value = ''; emptyOpt.textContent = ''; proyectoSelect.appendChild(emptyOpt);
+        lista.forEach(function (p) {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.nombre;
+            proyectoSelect.appendChild(opt);
+        });
+
+        const listaIds = lista.map(function (p) { return String(p.id); });
+        if (currentSelected && listaIds.indexOf(String(currentSelected)) !== -1) {
+            if (window.jQuery && $(proyectoSelect).hasClass('select2')) {
+                $(proyectoSelect).val(currentSelected).trigger('change');
+            } else {
+                proyectoSelect.value = currentSelected;
+            }
+        } else {
+            if (window.jQuery && $(proyectoSelect).hasClass('select2')) {
+                $(proyectoSelect).val(null).trigger('change');
+            } else {
+                proyectoSelect.value = '';
+            }
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const totalForms = document.getElementById('id_productosolicitado_set-TOTAL_FORMS');
         const formsetContainer = document.getElementById('formset-container');
@@ -175,6 +267,22 @@
         const initialFormCount = parseInt(totalForms.value, 10);
 
         initializeSelect2();
+
+        toggleProyectoCampo();
+        const initialClienteId = (window.jQuery && $('select[name="cliente"]').hasClass('select2')) ? $('select[name="cliente"]').val() : (document.querySelector('select[name="cliente"]') || {}).value;
+        if (initialClienteId) poblarProyectosEditar(initialClienteId);
+
+        const clienteSelect = document.querySelector('select[name="cliente"], input[name="cliente"]');
+        if (clienteSelect) clienteSelect.addEventListener('change', function () { toggleProyectoCampo(); poblarProyectosEditar(this.value); });
+
+        if (window.jQuery) {
+            try {
+                const $cliente = $('select[name="cliente"]');
+                if ($cliente.length) {
+                    $cliente.on('change', function () { const v = $(this).val(); console.log('editar jQuery change cliente:', v); toggleProyectoCampo(); poblarProyectosEditar(v); });
+                }
+            } catch (e) { console.warn('No se pudo enganchar jQuery change en editar:', e); }
+        }
 
         function disableFormInputs(form) {
             form.querySelectorAll('input, select, textarea').forEach(el => {
