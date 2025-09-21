@@ -53,8 +53,8 @@
                                 <td>{{ proyecto.nombre_contacto }}</td>
                                 <td>{{ proyecto.telefono_contacto }}</td>
                                 <td>{{ proyecto.email_contacto }}</td>
-                                <td>{{ proyecto.direccion_cliente }}</td>
-                                <td>{{ proyecto.ciudad_cliente }}</td>
+                                <td>{{ proyecto.direccion_proyecto }}</td>
+                                <td>{{ proyecto.ciudad_proyecto }}</td>
                                 <td class="td-actions text-left">
                                     <a href="{% url 'editar_proyecto' proyecto.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
@@ -65,18 +65,18 @@
                                 </td>
 
                                 <!-- Inicio modal de confirmación -->
-                                <div class="modal fade" id="confirmDeleteModal{{ cliente.id }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ cliente.id }}" aria-hidden="true">
+                                <div class="modal fade" id="confirmDeleteModal{{ proyecto.id }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ proyecto.id }}" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ cliente.id }}">Confirmar Eliminación</h5>
+                                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ proyecto.id }}">Confirmar Eliminación</h5>
                                             </div>
                                             <div class="modal-body">
-                                                ¿Estás seguro de que deseas eliminar el cliente <strong>{{ cliente.nombre_cliente }}</strong>?
+                                                ¿Estás seguro de que deseas eliminar el proyecto <strong>{{ proyecto.nombre_proyecto }}</strong>?
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <form method="post" action="{% url 'eliminar_cliente' cliente.id %}">
+                                                <form method="post" action="{% url 'eliminar_proyecto' proyecto.id %}">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-danger">Eliminar</button>
                                                 </form>
