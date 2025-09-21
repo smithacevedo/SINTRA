@@ -5,9 +5,10 @@ from django.forms import inlineformset_factory
 class OrdenCompraForm(forms.ModelForm):
     class Meta:
         model = OrdenCompra
-        fields = ['codigo_oc', 'cliente', 'fecha_solicitud']
+        fields = '__all__'
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-control select2'}),
+            'proyecto': forms.Select(attrs={'class': 'form-control select2'}),
             'fecha_solicitud': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date'
