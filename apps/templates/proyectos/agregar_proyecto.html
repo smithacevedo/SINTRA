@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Agregar Cliente {% endblock %}
+{% block title %} Agregar Proyecto {% endblock %}
 
 {% block stylesheets %}
 <!-- Select2 CSS -->
@@ -33,7 +33,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title">Registrar Cliente</h4>
+                <h4 class="card-title">Registrar Proyecto</h4>
                 <p class="card-category">Los campos con <span style="color: red;">(*)</span> son obligatorios</p>
             </div>
             <div class="card-body">
@@ -44,15 +44,37 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Cliente <span style="color: red;">(*)</span></label>
-                                <input type="text" class="form-control" name="nombre_cliente" value="{{ form.nombre_cliente.value|default_if_none:'' }}" required>
+                                <label class="bmd-label-floating">Cliente <span style="color: red;">(*)</span></label>
+                                <select class="form-control select2" name="cliente" value="{{ form.cliente.value|default_if_none:'' }}">
+                                    {% for choice in form.cliente.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if choice.0 == form.cliente.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Cliente <span style="color: red;">(*)</span></label>
-                                <input type="text" class="form-control" name="email_cliente" value="{{ form.email_cliente.value|default_if_none:'' }}" required>
-                                {% for error in form.email_cliente.errors %}
+                                <label class="bmd-label-floating">Ciudad <span style="color: red;">(*)</span></label>
+                                <select class="form-control select2" name="ciudad_proyecto" value="{{ form.ciudad_proyecto.value|default_if_none:'' }}">
+                                    {% for choice in form.ciudad_proyecto.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if choice.0 == form.ciudad_proyecto.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Nombre proyecto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="nombre_proyecto" value="{{ form.nombre_proyecto.value|default_if_none:'' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Email proyecto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="email_proyecto" value="{{ form.email_proyecto.value|default_if_none:'' }}" required>
+                                {% for error in form.email_proyecto.errors %}
                                     <div class="text-danger">{{ error }}</div>
                                 {% endfor %}
                             </div>
@@ -61,13 +83,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Nombre Contacto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Nombre contacto <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="nombre_contacto" value="{{ form.nombre_contacto.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Teléfono Contacto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Teléfono contacto <span style="color: red;">(*)</span></label>
                                 <input type="number" class="form-control" name="telefono_contacto" value="{{ form.telefono_contacto.value|default_if_none:'' }}" required>
                             </div>
                         </div>
@@ -75,42 +97,19 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Email Contacto <span style="color: red;">(*)</span></label>
+                                <label class="bmd-label-floating">Email contacto <span style="color: red;">(*)</span></label>
                                 <input type="text" class="form-control" name="email_contacto" value="{{ form.email_contacto.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="bmd-label-floating">Dirección <span style="color: red;">(*)</span></label>
-                                <input type="text" class="form-control" name="direccion_cliente" value="{{ form.direccion_cliente.value|default_if_none:'' }}" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="bmd-label-floating">Ciudad <span style="color: red;">(*)</span></label>
-                                <select class="form-control select2" name="ciudad_cliente" value="{{ form.ciudad_cliente.value|default_if_none:'' }}">
-                                    {% for choice in form.ciudad_cliente.field.choices %}
-                                    <option value="{{ choice.0 }}" {% if choice.0 == form.ciudad_cliente.value %}selected{% endif %}>{{ choice.1 }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-check" style="margin-top: 3rem;">
-                                <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" name="tiene_proyectos" value="1" {% if form.tiene_proyectos.value %}checked{% endif %}>
-                                    <span class="form-check-sign">
-                                        <span class="check"></span>
-                                    </span>
-                                    <td>¿Tiene proyectos este cliente?</td>
-                                </label>
+                                <input type="text" class="form-control" name="direccion_proyecto" value="{{ form.direccion_proyecto.value|default_if_none:'' }}" required>
                             </div>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary pull-right">Guardar</button>
-                    <a href="{% url 'lista_clientes' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
+                    <a href="{% url 'lista_proyectos' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
                     <div class="clearfix"></div>
                 </form>
             </div>
