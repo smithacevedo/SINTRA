@@ -3,6 +3,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib import messages
+from apps.clientes.models import Clientes
+from apps.proyectos.models import Proyectos
 
 from .models import OrdenCompra, ProductoSolicitado
 from .forms import OrdenCompraForm, ProductoFormSet
@@ -28,15 +30,25 @@ class AgregarOrdenCompraView(CreateView):
     def get(self, request, *args, **kwargs):
         form = self.form_class()
         formset = ProductoFormSet(prefix='productosolicitado_set')
+        clientes_flags = {str(c.id): c.tiene_proyectos for c in Clientes.objects.all()}
+        proyectos_by_cliente = {}
+        for p in Proyectos.objects.select_related('cliente').all():
+            proyectos_by_cliente.setdefault(str(p.cliente_id), []).append({'id': p.id, 'nombre': p.nombre_proyecto})
         return render(request, self.template_name, {
             'form': form,
             'formset': formset,
-            'segment': 'ordenes'
+            'segment': 'ordenes',
+            'clientes_flags': clientes_flags,
+            'proyectos_by_cliente': proyectos_by_cliente,
         })
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         formset = ProductoFormSet(request.POST, prefix='productosolicitado_set')
+        clientes_flags = {str(c.id): c.tiene_proyectos for c in Clientes.objects.all()}
+        proyectos_by_cliente = {}
+        for p in Proyectos.objects.select_related('cliente').all():
+            proyectos_by_cliente.setdefault(str(p.cliente_id), []).append({'id': p.id, 'nombre': p.nombre_proyecto})
 
         if form.is_valid() and formset.is_valid():
             orden = form.save()
@@ -51,7 +63,9 @@ class AgregarOrdenCompraView(CreateView):
         return render(request, self.template_name, {
             'form': form,
             'formset': formset,
-            'segment': 'ordenes'
+            'segment': 'ordenes',
+            'clientes_flags': clientes_flags,
+            'proyectos_by_cliente': proyectos_by_cliente,
         }, status=400)
 
 
@@ -74,6 +88,12 @@ class EditarOrdenCompraView(UpdateView):
                 instance=self.object, 
                 prefix='productosolicitado_set'
             )
+        clientes_flags = {str(c.id): c.tiene_proyectos for c in Clientes.objects.all()}
+        proyectos_by_cliente = {}
+        for p in Proyectos.objects.select_related('cliente').all():
+            proyectos_by_cliente.setdefault(str(p.cliente_id), []).append({'id': p.id, 'nombre': p.nombre_proyecto})
+        context['clientes_flags'] = clientes_flags
+        context['proyectos_by_cliente'] = proyectos_by_cliente
         context['segment'] = 'ordenes'
         return context
 

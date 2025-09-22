@@ -33,6 +33,7 @@
                             <tr>
                                 <th>Código OC</th>
                                 <th>Cliente</th>
+                                <th>Proyecto</th>
                                 <th>Fecha de Solicitud</th>
                                 <th>Acciones</th>
                             </tr>
@@ -42,6 +43,13 @@
                             <tr>
                                 <td>{{ orden.codigo_oc }}</td>
                                 <td>{{ orden.cliente.nombre_cliente }}</td>
+                                <td>
+                                    {% if orden.proyecto %}
+                                        {{ orden.proyecto.nombre_proyecto }}
+                                    {% else %}
+                                        No aplica
+                                    {% endif %}
+                                </td>
                                 <td>{{ orden.fecha_solicitud }}</td>
                                 <td class="td-actions text-left">
                                     <a href="{% url 'editar_orden_compra' orden.id %}" class="btn btn-primary btn-link btn-sm">

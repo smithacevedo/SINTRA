@@ -2,11 +2,13 @@ from django.db import models
 from apps.clientes.models import Clientes
 from django.utils import timezone
 from apps.productos.models import Producto
+from apps.proyectos.models import Proyectos
 
 
 class OrdenCompra(models.Model):
     codigo_oc = models.CharField(max_length=20, unique=True, blank=True, null=True)
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE, related_name='ordenes')
+    proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name='ordenes', blank=True, null=True)
     fecha_solicitud = models.DateField(default=timezone.now)
 
     def __str__(self):

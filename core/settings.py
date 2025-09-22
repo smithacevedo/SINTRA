@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'apps.proveedores',
     'apps.despachos',
 
+    'apps.proyectos',
+    'apps.detalles_orden',
 ]
 
 MIDDLEWARE = [
