@@ -19,5 +19,20 @@ class ProductoSolicitado(models.Model):
     cantidad = models.PositiveIntegerField()
     descripcion = models.TextField(blank=True, null=True)
 
+    @property
+    def despachado(self):
+
+        return sum(d.cantidad for d in self.despachos.all())
+
+    @property
+    def pendiente(self):
+
+        return self.cantidad - self.despachado
+
+    @property
+    def completado(self):
+
+        return self.pendiente == 0
+
     def __str__(self):
-        return f'{self.producto.referencia} - {self.cantidad}'
+        return f'{self.producto.referencia} - Solicitado: {self.cantidad}, Despachado: {self.despachado}, Pendiente: {self.pendiente}'

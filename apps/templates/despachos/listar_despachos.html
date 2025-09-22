@@ -36,10 +36,16 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                   
                 {% else %}
                     <p>¡🎉 No hay productos pendientes de despacho! 🎉</p>
                 {% endif %}
+                             <div class="mt-4 d-flex justify-content-between">
+                        <a href="{% url 'buscar_orden'%}"
+                            class="btn btn-secondary">Volver</a>
+                    </div>
             </div>
+
         </div>
     </div>
 </div>

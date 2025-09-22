@@ -38,10 +38,10 @@
           <p>Proveedores</p>
         </a>
       </li>
-      <li class="nav-item {% if 'detalles_orden' in segment %} active {% endif %}">
-        <a class="nav-link" href="{% url 'listar_pendientes' %}">
+      <li class="nav-item {% if 'despachos' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'buscar_orden' %}">
           <i class="material-icons">library_books</i>
-          <p>Detalles de las ordenes</p>
+          <p>Despachos</p>
         </a>
       </li>
       <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
