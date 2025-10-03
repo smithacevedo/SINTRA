@@ -5,9 +5,13 @@ from django.views.generic import ListView, CreateView, UpdateView
 from apps.clientes.forms import ClienteForm
 from .models import Clientes
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.utils.permisos import requiere_permiso
+from django.utils.decorators import method_decorator
 
 
-class ListaClientesView(ListView):
+@method_decorator(requiere_permiso('ver_clientes'), name='dispatch')
+class ListaClientesView(LoginRequiredMixin, ListView):
     model = Clientes
     template_name = 'clientes/lista_clientes.html'
     context_object_name = 'clientes'
@@ -17,7 +21,8 @@ class ListaClientesView(ListView):
         context['segment'] = 'clientes'
         return context
 
-class AgregarClienteView(CreateView):
+@method_decorator(requiere_permiso('crear_clientes'), name='dispatch')
+class AgregarClienteView(LoginRequiredMixin, CreateView):
     model = Clientes
     form_class = ClienteForm
     template_name = 'clientes/agregar_cliente.html'
@@ -33,7 +38,8 @@ class AgregarClienteView(CreateView):
         return super().form_valid(form)
 
 
-class EditarClienteView(UpdateView):
+@method_decorator(requiere_permiso('editar_clientes'), name='dispatch')
+class EditarClienteView(LoginRequiredMixin, UpdateView):
     model = Clientes
     form_class = ClienteForm
     template_name = 'clientes/editar_cliente.html'
@@ -50,7 +56,8 @@ class EditarClienteView(UpdateView):
         return response
 
 
-class EliminarClienteView(View):
+@method_decorator(requiere_permiso('eliminar_clientes'), name='dispatch')
+class EliminarClienteView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         cliente = get_object_or_404(Clientes, pk=pk)
         cliente.delete()

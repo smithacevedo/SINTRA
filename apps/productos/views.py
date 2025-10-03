@@ -5,9 +5,13 @@ from .forms import ProductoForm
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.utils.permisos import requiere_permiso
+from django.utils.decorators import method_decorator
 
 
-class ListaProductosView(ListView):
+@method_decorator(requiere_permiso('ver_productos'), name='dispatch')
+class ListaProductosView(LoginRequiredMixin, ListView):
     model = Producto
     template_name = 'productos/lista_productos.html'
     context_object_name = 'productos'
@@ -18,7 +22,8 @@ class ListaProductosView(ListView):
         return context
 
 
-class AgregarProductoView(CreateView):
+@method_decorator(requiere_permiso('crear_productos'), name='dispatch')
+class AgregarProductoView(LoginRequiredMixin, CreateView):
     model = Producto
     form_class = ProductoForm
     template_name = 'productos/agregar_producto.html'
@@ -38,7 +43,8 @@ class AgregarProductoView(CreateView):
         return super().form_invalid(form)
 
 
-class EditarProductoView(UpdateView):
+@method_decorator(requiere_permiso('editar_productos'), name='dispatch')
+class EditarProductoView(LoginRequiredMixin, UpdateView):
     model = Producto
     form_class = ProductoForm
     template_name = 'productos/editar_producto.html'
@@ -58,7 +64,8 @@ class EditarProductoView(UpdateView):
         return super().form_invalid(form)
 
 
-class EliminarProductoView(View):
+@method_decorator(requiere_permiso('eliminar_productos'), name='dispatch')
+class EliminarProductoView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         producto = get_object_or_404(Producto, pk=pk)
         producto.delete()

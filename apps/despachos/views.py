@@ -3,8 +3,10 @@ from django.contrib import messages
 from django.utils import timezone
 from apps.ordenes_compra.models import OrdenCompra, ProductoSolicitado
 from .models import Despacho
+from apps.utils.permisos import requiere_permiso
 
 
+@requiere_permiso('ver_despachos')
 def buscar_orden(request):
     if request.method == "POST":
         codigo_oc = request.POST.get("codigo_oc", "").strip()
@@ -17,6 +19,7 @@ def buscar_orden(request):
     return render(request, "despachos/buscar_orden.html")
 
 
+@requiere_permiso('crear_despachos')
 def despacho_unificado(request, codigo_oc):
     orden = get_object_or_404(OrdenCompra, codigo_oc=codigo_oc)
     
@@ -75,6 +78,7 @@ def despacho_unificado(request, codigo_oc):
     })
 
 
+@requiere_permiso('editar_despachos')
 def reintegrar_despacho(request, despacho_id):
     despacho = get_object_or_404(Despacho, id=despacho_id)
     

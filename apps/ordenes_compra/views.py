@@ -5,12 +5,16 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.contrib import messages
 from apps.clientes.models import Clientes
 from apps.proyectos.models import Proyectos
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.utils.permisos import requiere_permiso
+from django.utils.decorators import method_decorator
 
 from .models import OrdenCompra, ProductoSolicitado
 from .forms import OrdenCompraForm, ProductoFormSet
 
 
-class ListaOrdenesCompraView(ListView):
+@method_decorator(requiere_permiso('ver_pedidos'), name='dispatch')
+class ListaOrdenesCompraView(LoginRequiredMixin, ListView):
     model = OrdenCompra
     template_name = 'ordenes_compra/lista_ordenes_compra.html'
     context_object_name = 'ordenes'
@@ -21,7 +25,8 @@ class ListaOrdenesCompraView(ListView):
         return context
 
 
-class AgregarOrdenCompraView(CreateView):
+@method_decorator(requiere_permiso('crear_pedidos'), name='dispatch')
+class AgregarOrdenCompraView(LoginRequiredMixin, CreateView):
     model = OrdenCompra
     form_class = OrdenCompraForm
     template_name = 'ordenes_compra/agregar_orden_compra.html'
@@ -69,7 +74,8 @@ class AgregarOrdenCompraView(CreateView):
         }, status=400)
 
 
-class EditarOrdenCompraView(UpdateView):
+@method_decorator(requiere_permiso('editar_pedidos'), name='dispatch')
+class EditarOrdenCompraView(LoginRequiredMixin, UpdateView):
     model = OrdenCompra
     form_class = OrdenCompraForm
     template_name = 'ordenes_compra/editar_orden_compra.html'
@@ -112,7 +118,8 @@ class EditarOrdenCompraView(UpdateView):
         return self.render_to_response(self.get_context_data(form=form), status=400)
 
 
-class EliminarOrdenCompraView(View):
+@method_decorator(requiere_permiso('eliminar_pedidos'), name='dispatch')
+class EliminarOrdenCompraView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         orden = get_object_or_404(OrdenCompra, pk=pk)
         orden.delete()

@@ -26,7 +26,9 @@
                     <h4 class="card-title mt-0">Lista de Productos</h4>
                     <p class="card-category">Aquí puedes ver todos los productos registrados</p>
                 </div>
+                {% if 'crear_productos' in permisos_usuario %}
                 <a href="{% url 'agregar_producto' %}" class="btn btn-secondary">Agregar Producto</a>
+                {% endif %}
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -52,12 +54,16 @@
                                 <td>{{ producto.linea }}</td>
                                 <td>{{ producto.descripcion }}</td>
                                 <td class="td-actions text-left">
+                                    {% if 'editar_productos' in permisos_usuario %}
                                     <a href="{% url 'editar_producto' producto.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
                                     </a>
+                                    {% endif %}
+                                    {% if 'eliminar_productos' in permisos_usuario %}
                                     <button type="button" class="btn btn-danger btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.id }}">
                                         <i class="material-icons">delete</i>
                                     </button>
+                                    {% endif %}
                                 </td>
 
                                 <!-- Inicio modal de confirmación -->
