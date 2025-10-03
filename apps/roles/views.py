@@ -2,13 +2,24 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Rol
 from .forms import RolForm
-from apps.utils.permisos import requiere_permiso
+from apps.utils.permisos import requiere_permiso, tiene_permiso
 
 
-@requiere_permiso('ver_roles')
 def lista_roles(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not tiene_permiso(request.user, 'ver_roles'):
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('home')
+    
+    solo_lectura = not (tiene_permiso(request.user, 'crear_roles') or 
+                       tiene_permiso(request.user, 'editar_roles') or 
+                       tiene_permiso(request.user, 'eliminar_roles'))
     roles = Rol.objects.all().order_by('nombre')
-    return render(request, 'roles/lista_roles.html', {'roles': roles})
+    return render(request, 'roles/lista_roles.html', {
+        'roles': roles,
+        'solo_lectura': solo_lectura
+    })
 
 
 @requiere_permiso('crear_roles')

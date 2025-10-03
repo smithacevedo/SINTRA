@@ -24,7 +24,7 @@
                     <h4 class="card-title mt-0">Lista de Órdenes de Compra</h4>
                     <p class="card-category">Aquí puedes ver todas las órdenes registradas</p>
                 </div>
-                {% if 'crear_pedidos' in permisos_usuario %}
+                {% if 'crear_pedidos' in permisos_usuario and not solo_lectura %}
                 <a href="{% url 'agregar_orden_compra' %}" class="btn btn-secondary">Agregar Orden</a>
                 {% endif %}
             </div>
@@ -54,15 +54,18 @@
                                 </td>
                                 <td>{{ orden.fecha_solicitud }}</td>
                                 <td class="td-actions text-left">
-                                    {% if 'editar_pedidos' in permisos_usuario %}
+                                    {% if 'editar_pedidos' in permisos_usuario and not solo_lectura %}
                                     <a href="{% url 'editar_orden_compra' orden.id %}" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
                                     </a>
                                     {% endif %}
-                                    {% if 'eliminar_pedidos' in permisos_usuario %}
+                                    {% if 'eliminar_pedidos' in permisos_usuario and not solo_lectura %}
                                     <button type="button" class="btn btn-danger btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ orden.id }}">
                                         <i class="material-icons">delete</i>
                                     </button>
+                                    {% endif %}
+                                    {% if solo_lectura %}
+                                    <span class="text-muted">Solo lectura</span>
                                     {% endif %}
                                 </td>
                             </tr>

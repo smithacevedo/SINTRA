@@ -26,7 +26,7 @@
                     <h4 class="card-title mt-0">Lista de Clientes</h4>
                     <p class="card-category">Aquí puedes ver todos los clientes registrados</p>
                 </div>
-                {% if 'crear_clientes' in permisos_usuario %}
+                {% if 'crear_clientes' in permisos_usuario and not solo_lectura %}
                 <a href="{% url 'agregar_cliente' %}" class="btn btn-secondary">Agregar Cliente</a>
                 {% endif %}
             </div>
@@ -58,15 +58,18 @@
                                 <td>{{ cliente.ciudad_cliente }}</td>
                                 <td>{% if cliente.tiene_proyectos %}Sí{% else %}No{% endif %}</td>
                                 <td class="td-actions text-left">
-                                    {% if 'editar_clientes' in permisos_usuario %}
+                                    {% if 'editar_clientes' in permisos_usuario and not solo_lectura %}
                                     <a href="{% url 'editar_cliente' cliente.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
                                     </a>
                                     {% endif %}
-                                    {% if 'eliminar_clientes' in permisos_usuario %}
+                                    {% if 'eliminar_clientes' in permisos_usuario and not solo_lectura %}
                                     <button type="button" class="btn btn-danger btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ cliente.id }}">
                                         <i class="material-icons">delete</i>
                                     </button>
+                                    {% endif %}
+                                    {% if solo_lectura %}
+                                    <span class="text-muted">Solo lectura</span>
                                     {% endif %}
                                 </td>
 

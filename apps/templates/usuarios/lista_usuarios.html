@@ -11,11 +11,13 @@
                 <p class="card-category">Gestionar usuarios del sistema</p>
             </div>
             <div class="card-body">
+                {% if 'crear_usuarios' in permisos_usuario and not solo_lectura %}
                 <div class="mb-3">
                     <a href="{% url 'crear_usuario' %}" class="btn btn-primary">
                         <i class="material-icons">person_add</i> Nuevo Usuario
                     </a>
                 </div>
+                {% endif %}
 
                 {% if usuarios %}
                 <div class="table-responsive">
@@ -65,15 +67,20 @@
                                     {% endif %}
                                 </td>
                                 <td>
+                                    {% if 'editar_usuarios' in permisos_usuario and not solo_lectura %}
                                     <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-sm btn-warning">
                                         <i class="material-icons">edit</i>
                                     </a>
-                                    {% if usuario != request.user %}
+                                    {% endif %}
+                                    {% if 'eliminar_usuarios' in permisos_usuario and not solo_lectura and usuario != request.user %}
                                     <a href="{% url 'eliminar_usuario' usuario.id %}" 
                                        class="btn btn-sm btn-danger"
                                        onclick="return confirm('¿Está seguro de eliminar este usuario?')">
                                         <i class="material-icons">delete</i>
                                     </a>
+                                    {% endif %}
+                                    {% if solo_lectura %}
+                                    <span class="text-muted">Solo lectura</span>
                                     {% endif %}
                                 </td>
                             </tr>

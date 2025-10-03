@@ -6,22 +6,32 @@ from django.contrib import messages
 from apps.clientes.models import Clientes
 from apps.proyectos.models import Proyectos
 from django.contrib.auth.mixins import LoginRequiredMixin
-from apps.utils.permisos import requiere_permiso
+from apps.utils.permisos import requiere_permiso, tiene_permiso
 from django.utils.decorators import method_decorator
 
 from .models import OrdenCompra, ProductoSolicitado
 from .forms import OrdenCompraForm, ProductoFormSet
 
 
-@method_decorator(requiere_permiso('ver_pedidos'), name='dispatch')
-class ListaOrdenesCompraView(LoginRequiredMixin, ListView):
+class ListaOrdenesCompraView(ListView):
     model = OrdenCompra
     template_name = 'ordenes_compra/lista_ordenes_compra.html'
     context_object_name = 'ordenes'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not tiene_permiso(request.user, 'ver_pedidos'):
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['segment'] = 'ordenes'
+        context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_pedidos') or 
+                                      tiene_permiso(self.request.user, 'editar_pedidos') or 
+                                      tiene_permiso(self.request.user, 'eliminar_pedidos'))
         return context
 
 

@@ -2,13 +2,24 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Permiso
 from .forms import PermisoForm
-from apps.utils.permisos import requiere_permiso
+from apps.utils.permisos import requiere_permiso, tiene_permiso
 
 
-@requiere_permiso('ver_permisos')
 def lista_permisos(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not tiene_permiso(request.user, 'ver_permisos'):
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('home')
+    
+    solo_lectura = not (tiene_permiso(request.user, 'crear_permisos') or 
+                       tiene_permiso(request.user, 'editar_permisos') or 
+                       tiene_permiso(request.user, 'eliminar_permisos'))
     permisos = Permiso.objects.all().order_by('nombre')
-    return render(request, 'permisos/lista_permisos.html', {'permisos': permisos})
+    return render(request, 'permisos/lista_permisos.html', {
+        'permisos': permisos,
+        'solo_lectura': solo_lectura
+    })
 
 
 @requiere_permiso('crear_permisos')

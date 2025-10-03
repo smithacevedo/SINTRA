@@ -6,19 +6,29 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from apps.utils.permisos import requiere_permiso
+from apps.utils.permisos import requiere_permiso, tiene_permiso
 from django.utils.decorators import method_decorator
 
 
-@method_decorator(requiere_permiso('ver_productos'), name='dispatch')
-class ListaProductosView(LoginRequiredMixin, ListView):
+class ListaProductosView(ListView):
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not tiene_permiso(request.user, 'ver_productos'):
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
     model = Producto
     template_name = 'productos/lista_productos.html'
     context_object_name = 'productos'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['segment'] = 'productos'  # Esta es una variable que se manda al template para identificar la sección actual
+        context['segment'] = 'productos'
+        # Solo lectura si solo tiene permiso de ver
+        context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_productos') or 
+                                      tiene_permiso(self.request.user, 'editar_productos') or 
+                                      tiene_permiso(self.request.user, 'eliminar_productos'))
         return context
 
 

@@ -7,13 +7,24 @@ from apps.roles.models import Rol
 from apps.permisos.models import Permiso
 from .models import UsuarioRol, PerfilUsuario
 from .forms import UsuarioForm
-from apps.utils.permisos import requiere_permiso
+from apps.utils.permisos import requiere_permiso, tiene_permiso
 
 
-@requiere_permiso('ver_usuarios')
 def lista_usuarios(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not tiene_permiso(request.user, 'ver_usuarios'):
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('home')
+    
+    solo_lectura = not (tiene_permiso(request.user, 'crear_usuarios') or 
+                       tiene_permiso(request.user, 'editar_usuarios') or 
+                       tiene_permiso(request.user, 'eliminar_usuarios'))
     usuarios = User.objects.all().order_by('username')
-    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+    return render(request, 'usuarios/lista_usuarios.html', {
+        'usuarios': usuarios,
+        'solo_lectura': solo_lectura
+    })
 
 
 @requiere_permiso('crear_usuarios')

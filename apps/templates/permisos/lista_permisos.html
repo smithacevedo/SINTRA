@@ -11,11 +11,13 @@
                 <p class="card-category">Administrar permisos del sistema</p>
             </div>
             <div class="card-body">
+                {% if 'crear_permisos' in permisos_usuario and not solo_lectura %}
                 <div class="mb-3">
                     <a href="{% url 'crear_permiso' %}" class="btn btn-primary">
                         <i class="material-icons">add</i> Nuevo Permiso
                     </a>
                 </div>
+                {% endif %}
 
                 {% if permisos %}
                 <div class="table-responsive">
@@ -35,14 +37,21 @@
                                 <td><strong>{{ permiso.nombre }}</strong></td>
                                 <td><code>{{ permiso.llave }}</code></td>
                                 <td>
+                                    {% if 'editar_permisos' in permisos_usuario and not solo_lectura %}
                                     <a href="{% url 'editar_permiso' permiso.id %}" class="btn btn-sm btn-warning">
                                         <i class="material-icons">edit</i>
                                     </a>
+                                    {% endif %}
+                                    {% if 'eliminar_permisos' in permisos_usuario and not solo_lectura %}
                                     <a href="{% url 'eliminar_permiso' permiso.id %}" 
                                        class="btn btn-sm btn-danger"
                                        onclick="return confirm('¿Está seguro de eliminar este permiso?')">
                                         <i class="material-icons">delete</i>
                                     </a>
+                                    {% endif %}
+                                    {% if solo_lectura %}
+                                    <span class="text-muted">Solo lectura</span>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
