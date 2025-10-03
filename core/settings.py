@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.proveedores',
     'apps.despachos',
     'apps.remisiones',
+    'apps.permisos',
     'apps.proyectos',
     #'apps.detalles_orden',
 ]

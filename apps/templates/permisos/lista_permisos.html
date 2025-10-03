@@ -1,0 +1,61 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Permisos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Gestión de Permisos</h4>
+                <p class="card-category">Administrar permisos del sistema</p>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <a href="{% url 'crear_permiso' %}" class="btn btn-primary">
+                        <i class="material-icons">add</i> Nuevo Permiso
+                    </a>
+                </div>
+
+                {% if permisos %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Llave</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for permiso in permisos %}
+                            <tr>
+                                <td>{{ permiso.id }}</td>
+                                <td><strong>{{ permiso.nombre }}</strong></td>
+                                <td><code>{{ permiso.llave }}</code></td>
+                                <td>
+                                    <a href="{% url 'editar_permiso' permiso.id %}" class="btn btn-sm btn-warning">
+                                        <i class="material-icons">edit</i>
+                                    </a>
+                                    <a href="{% url 'eliminar_permiso' permiso.id %}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('¿Está seguro de eliminar este permiso?')">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="material-icons">info</i> No hay permisos registrados.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
