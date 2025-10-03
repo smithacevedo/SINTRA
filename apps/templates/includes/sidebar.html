@@ -8,66 +8,104 @@
     <ul class="nav">
       {% if request.user.is_authenticated %}
 
+      {% if 'ver_dashboard' in permisos_usuario %}
       <li class="nav-item {% if 'index' in segment %} active {% endif %}">
         <a class="nav-link" href="/">
           <i class="material-icons">dashboard</i>
           <p>Dashboard</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_productos' in permisos_usuario %}
       <li class="nav-item {% if 'productos' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_productos' %}">
           <i class="material-icons">category</i>
           <p>Productos</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_clientes' in permisos_usuario %}
       <li class="nav-item {% if 'clientes' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_clientes' %}">
           <i class="material-icons">group</i>
           <p>Clientes</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_productos' in permisos_usuario %}
       <li class="nav-item {% if 'proyectos' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_proyectos' %}">
           <i class="material-icons">groups</i>
           <p>Proyectos</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_pedidos' in permisos_usuario %}
       <li class="nav-item {% if 'ordenes' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_ordenes_compra' %}">
           <i class="material-icons">shopping_bag</i>
           <p>Órdenes De Compra</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_productos' in permisos_usuario %}
       <li class="nav-item {% if 'proveedores' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_proveedores' %}">
           <i class="material-icons">local_shipping</i>
           <p>Proveedores</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_despachos' in permisos_usuario %}
       <li class="nav-item {% if 'despachos' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'buscar_orden' %}">
           <i class="material-icons">library_books</i>
           <p>Despachos</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_remisiones' in permisos_usuario %}
       <li class="nav-item {% if 'remisiones' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_remisiones' %}">
           <i class="material-icons">receipt</i>
           <p>Remisiones</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_permisos' in permisos_usuario %}
       <li class="nav-item {% if 'permisos' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_permisos' %}">
           <i class="material-icons">security</i>
           <p>Permisos</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_roles' in permisos_usuario %}
       <li class="nav-item {% if 'roles' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_roles' %}">
           <i class="material-icons">group</i>
           <p>Roles</p>
         </a>
       </li>
+      {% endif %}
+      
+      {% if 'ver_usuarios' in permisos_usuario %}
+      <li class="nav-item {% if 'usuarios' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_usuarios' %}">
+          <i class="material-icons">people</i>
+          <p>Usuarios</p>
+        </a>
+      </li>
+      {% endif %}
       <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
         <a class="nav-link" href="/ui-icons.html">
           <i class="material-icons">bubble_chart</i>

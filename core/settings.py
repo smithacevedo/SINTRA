@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.remisiones',
     'apps.permisos',
     'apps.roles',
+    'apps.usuarios',
     'apps.proyectos',
     #'apps.detalles_orden',
 ]
@@ -54,11 +55,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.usuarios.middleware.PrimerAccesoMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.common.CommonMiddleware',
 
 ]
 
@@ -78,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.utils.context_processors.permisos_usuario',
             ],
         },
     },

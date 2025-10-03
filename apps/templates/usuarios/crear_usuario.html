@@ -1,0 +1,159 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crear Usuario{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Crear Nuevo Usuario</h4>
+            </div>
+            <div class="card-body">
+                <!-- Mostrar errores del formulario -->
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <h5>Errores en el formulario:</h5>
+                        {% for field, errors in form.errors.items %}
+                            <strong>{{ field }}:</strong>
+                            {% for error in errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
+                                {{ form.username }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}">Email</label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.first_name.id_for_label }}">Nombre</label>
+                                {{ form.first_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.last_name.id_for_label }}">Apellido</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+                                {{ form.password1 }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.password2.id_for_label }}">Confirmar Contraseña</label>
+                                {{ form.password2 }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gestión de Roles -->
+                    <div class="form-group mt-4">
+                        <label>Gestión de Roles</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Roles Disponibles</h6>
+                                <select id="rolesDisponibles" class="form-control" size="8" style="height: 180px;">
+                                    {% for rol in roles %}
+                                    <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-success btn-sm mt-2" onclick="agregarRol()">
+                                    <i class="material-icons">add</i> Agregar
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Roles Asignados</h6>
+                                <select id="rolesAsignados" class="form-control" size="8" style="height: 180px;">
+                                </select>
+                                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="quitarRol()">
+                                    <i class="material-icons">remove</i> Quitar
+                                </button>
+                            </div>
+                        </div>
+                        <div id="rolesHidden"></div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="material-icons">save</i> Guardar
+                        </button>
+                        <a href="{% url 'lista_usuarios' %}" class="btn btn-secondary">
+                            <i class="material-icons">cancel</i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function agregarRol() {
+    const disponibles = document.getElementById('rolesDisponibles');
+    const asignados = document.getElementById('rolesAsignados');
+    
+    if (disponibles.selectedIndex >= 0) {
+        const option = disponibles.options[disponibles.selectedIndex];
+        const newOption = new Option(option.text, option.value);
+        asignados.add(newOption);
+        disponibles.remove(disponibles.selectedIndex);
+        actualizarRolesOcultos();
+    }
+}
+
+function quitarRol() {
+    const disponibles = document.getElementById('rolesDisponibles');
+    const asignados = document.getElementById('rolesAsignados');
+    
+    if (asignados.selectedIndex >= 0) {
+        const option = asignados.options[asignados.selectedIndex];
+        const newOption = new Option(option.text, option.value);
+        disponibles.add(newOption);
+        asignados.remove(asignados.selectedIndex);
+        actualizarRolesOcultos();
+    }
+}
+
+function actualizarRolesOcultos() {
+    const asignados = document.getElementById('rolesAsignados');
+    const hiddenContainer = document.getElementById('rolesHidden');
+    
+    hiddenContainer.innerHTML = '';
+    
+    for (let i = 0; i < asignados.options.length; i++) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'roles';
+        input.value = asignados.options[i].value;
+        hiddenContainer.appendChild(input);
+    }
+}
+
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarRolesOcultos();
+});
+</script>
+{% endblock %}
