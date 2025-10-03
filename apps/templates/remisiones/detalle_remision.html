@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Remisión {{ remision.numero_remision }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Remisión {{ remision.numero_remision }}</h4>
+                <p class="card-category">
+                    Orden: {{ remision.orden.codigo_oc }} | 
+                    Cliente: {{ remision.orden.cliente.nombre_cliente }} | 
+                    Fecha: {{ remision.fecha_remision|date:"d/m/Y H:i" }}
+                </p>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Referencia</th>
+                                <th>Cantidad Despachada</th>
+                                <th>Fecha Despacho</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in detalles %}
+                            <tr>
+                                <td>{{ detalle.despacho.producto_solicitado.producto.articulo }}</td>
+                                <td><strong>{{ detalle.despacho.producto_solicitado.producto.referencia }}</strong></td>
+                                <td>
+                                    <span class="badge badge-success">{{ detalle.despacho.cantidad }}</span>
+                                </td>
+                                <td>{{ detalle.despacho.fecha_despacho|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Resumen</h6>
+                                    <p><strong>Total productos:</strong> {{ detalles.count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{% url 'lista_remisiones' %}" class="btn btn-secondary">
+                        <i class="material-icons">arrow_back</i> Volver a Remisiones
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

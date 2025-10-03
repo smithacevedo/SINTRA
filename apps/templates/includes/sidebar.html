@@ -50,6 +50,12 @@
           <p>Despachos</p>
         </a>
       </li>
+      <li class="nav-item {% if 'remisiones' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_remisiones' %}">
+          <i class="material-icons">receipt</i>
+          <p>Remisiones</p>
+        </a>
+      </li>
       <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
         <a class="nav-link" href="/ui-icons.html">
           <i class="material-icons">bubble_chart</i>

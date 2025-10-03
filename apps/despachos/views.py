@@ -25,6 +25,8 @@ def despacho_unificado(request, codigo_oc):
         despachos_realizados = 0
         
         errores = []
+        despachos_creados = []
+        
         for producto_id in productos_seleccionados:
             cantidad_str = request.POST.get(f'cantidad_{producto_id}')
             if cantidad_str:
@@ -37,10 +39,11 @@ def despacho_unificado(request, codigo_oc):
                     elif cantidad > producto.pendiente:
                         errores.append(f"{producto.producto.referencia}: No puede despachar {cantidad}, solo hay {producto.pendiente} pendientes")
                     else:
-                        Despacho.objects.create(
+                        despacho = Despacho.objects.create(
                             producto_solicitado=producto,
                             cantidad=cantidad
                         )
+                        despachos_creados.append(despacho)
                         despachos_realizados += 1
                 except (ValueError, TypeError):
                     errores.append(f"Producto {producto_id}: Cantidad inválida")
@@ -50,7 +53,17 @@ def despacho_unificado(request, codigo_oc):
                 messages.error(request, error)
         
         if despachos_realizados > 0:
-            messages.success(request, f"Se realizaron {despachos_realizados} despachos correctamente.")
+            # Crear remisión automáticamente
+            from apps.remisiones.models import Remision, DetalleRemision
+            remision = Remision.objects.create(orden=orden)
+            
+            for despacho in despachos_creados:
+                DetalleRemision.objects.create(
+                    remision=remision,
+                    despacho=despacho
+                )
+            
+            messages.success(request, f"Se realizaron {despachos_realizados} despachos correctamente. Remisión: {remision.numero_remision}")
     
     productos_pendientes = [p for p in orden.productos.all() if p.pendiente > 0]
     productos_despachados = [p for p in orden.productos.all() if p.despachado > 0]
@@ -69,7 +82,20 @@ def reintegrar_despacho(request, despacho_id):
         despacho.reintegro = True
         despacho.fecha_reintegro = timezone.now()
         despacho.save()
-        messages.success(request, f"Despacho de {despacho.cantidad} unidades reintegrado.")
+        
+        # Verificar si todos los despachos de la remisión están reintegrados
+        if hasattr(despacho, 'remision_detalle'):
+            remision = despacho.remision_detalle.remision
+            despachos_activos = remision.detalles.filter(despacho__reintegro=False).count()
+            
+            if despachos_activos == 0:
+                numero_remision = remision.numero_remision
+                remision.delete()
+                messages.success(request, f"Despacho reintegrado. Remisión {numero_remision} eliminada (todos los productos reintegrados).")
+            else:
+                messages.success(request, f"Despacho de {despacho.cantidad} unidades reintegrado.")
+        else:
+            messages.success(request, f"Despacho de {despacho.cantidad} unidades reintegrado.")
     else:
         messages.warning(request, "Este despacho ya fue reintegrado.")
     

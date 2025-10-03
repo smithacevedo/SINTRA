@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'apps.ordenes_compra',
     'apps.proveedores',
     'apps.despachos',
-
+    'apps.remisiones',
     'apps.proyectos',
     #'apps.detalles_orden',
 ]
