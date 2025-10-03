@@ -24,7 +24,7 @@ def tiene_permiso(usuario, clave_permiso):
     try:
         roles_usuario = UsuarioRol.objects.filter(usuario=usuario)
         for usuario_rol in roles_usuario:
-            if usuario_rol.rol.permisos.filter(clave=clave_permiso).exists():
+            if usuario_rol.rol.permisos.filter(llave=clave_permiso).exists():
                 return True
         return False
     except:
@@ -37,7 +37,7 @@ def obtener_permisos_usuario(usuario):
         roles_usuario = UsuarioRol.objects.filter(usuario=usuario)
         for usuario_rol in roles_usuario:
             for permiso in usuario_rol.rol.permisos.all():
-                permisos.add(permiso.clave)
+                permisos.add(permiso.llave)
     except:
         pass
     return permisos

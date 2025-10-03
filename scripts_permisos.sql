@@ -1,7 +1,7 @@
 -- Scripts para crear permisos y roles
 
 -- Insertar permisos
-INSERT INTO permisos_permiso (nombre, clave) VALUES
+INSERT INTO permisos_permiso (nombre, llave) VALUES
 ('Ver Dashboard', 'ver_dashboard'),
 ('Ver Productos', 'ver_productos'),
 ('Crear Productos', 'crear_productos'),
@@ -35,11 +35,11 @@ INSERT INTO permisos_permiso (nombre, clave) VALUES
 ('Eliminar Permisos', 'eliminar_permisos');
 
 -- Insertar roles
-INSERT INTO roles_rol (nombre, descripcion) VALUES
-('Administrador', 'Acceso completo al sistema'),
-('Gerente', 'Acceso a gestión de productos, clientes y pedidos'),
-('Operador', 'Acceso a despachos y remisiones'),
-('Consultor', 'Solo lectura de información');
+INSERT INTO roles_rol (nombre) VALUES
+('Administrador'),
+('Gerente'),
+('Operador'),
+('Consultor');
 
 -- Asignar todos los permisos al rol Administrador
 INSERT INTO roles_rol_permisos (rol_id, permiso_id)
@@ -48,18 +48,21 @@ SELECT 1, id FROM permisos_permiso;
 -- Asignar permisos al rol Gerente
 INSERT INTO roles_rol_permisos (rol_id, permiso_id)
 SELECT 2, id FROM permisos_permiso 
-WHERE clave IN ('ver_dashboard', 'ver_productos', 'crear_productos', 'editar_productos', 
+WHERE llave IN ('ver_dashboard', 'ver_productos', 'crear_productos', 'editar_productos', 
                 'ver_clientes', 'crear_clientes', 'editar_clientes',
                 'ver_pedidos', 'crear_pedidos', 'editar_pedidos');
 
 -- Asignar permisos al rol Operador
 INSERT INTO roles_rol_permisos (rol_id, permiso_id)
 SELECT 3, id FROM permisos_permiso 
-WHERE clave IN ('ver_dashboard', 'ver_despachos', 'crear_despachos', 'editar_despachos',
+WHERE llave IN ('ver_dashboard', 'ver_despachos', 'crear_despachos', 'editar_despachos',
                 'ver_remisiones', 'crear_remisiones', 'editar_remisiones');
 
 -- Asignar permisos al rol Consultor
 INSERT INTO roles_rol_permisos (rol_id, permiso_id)
 SELECT 4, id FROM permisos_permiso 
-WHERE clave IN ('ver_dashboard', 'ver_productos', 'ver_clientes', 'ver_pedidos', 
+WHERE llave IN ('ver_dashboard', 'ver_productos', 'ver_clientes', 'ver_pedidos', 
                 'ver_despachos', 'ver_remisiones');
+
+-- NOTA: El usuario administrador se crea con el script Python crear_admin.py
+-- No crear usuario aquí porque el hash de contraseña debe ser generado por Django

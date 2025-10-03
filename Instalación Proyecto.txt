@@ -115,3 +115,15 @@ pip install --force-reinstall -r requirements.txt
 
 # En caso de no cargar información de cities_light en la bd correr:
 python manage.py cities_light --force-import-all --progress
+
+
+# Crear permisos y usuario admin
+
+# 2. Ejecutar scripts SQL
+\i limpiar_permisos.sql
+\i arreglar_secuencia.sql
+\i scripts_permisos.sql
+\q
+
+# 3. Crear usuario admin (OBLIGATORIO)
+python crear_admin.py
