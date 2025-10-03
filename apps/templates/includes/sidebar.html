@@ -62,6 +62,12 @@
           <p>Permisos</p>
         </a>
       </li>
+      <li class="nav-item {% if 'roles' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_roles' %}">
+          <i class="material-icons">group</i>
+          <p>Roles</p>
+        </a>
+      </li>
       <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
         <a class="nav-link" href="/ui-icons.html">
           <i class="material-icons">bubble_chart</i>

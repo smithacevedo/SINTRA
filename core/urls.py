@@ -19,6 +19,7 @@ urlpatterns = [
     path("despachos/", include('apps.despachos.urls')), 
     path("remisiones/", include('apps.remisiones.urls')),
     path("permisos/", include('apps.permisos.urls')),
+    path("roles/", include('apps.roles.urls')),
     path("proyectos/", include("apps.proyectos.urls")),
    # path("detalles_orden/", include('apps.detalles_orden.urls')), 
 

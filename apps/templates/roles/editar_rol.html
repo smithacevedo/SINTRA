@@ -1,0 +1,124 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Editar Rol{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header card-header-warning">
+                <h4 class="card-title">Editar Rol</h4>
+                <p class="card-category">ID: {{ rol.id }}</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="{{ form.nombre.id_for_label }}">Nombre del Rol</label>
+                        {{ form.nombre }}
+                    </div>
+                    <div class="form-group">
+                        <label>Gestión de Permisos</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Permisos Disponibles</h6>
+                                <select id="permisosDisponibles" class="form-control" size="10" style="height: 200px;">
+                                    {% for permiso in form.permisos.field.queryset %}
+                                    {% if permiso not in rol.permisos.all %}
+                                    <option value="{{ permiso.id }}">{{ permiso.nombre }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-success btn-sm mt-2" onclick="agregarPermiso()">
+                                    <i class="material-icons">add</i> Agregar
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Permisos Asignados</h6>
+                                <select id="permisosAsignados" class="form-control" size="10" style="height: 200px;">
+                                    {% for permiso in rol.permisos.all %}
+                                    <option value="{{ permiso.id }}">{{ permiso.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="quitarPermiso()">
+                                    <i class="material-icons">remove</i> Quitar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Campos ocultos para enviar los permisos seleccionados -->
+                        <div id="permisosHidden"></div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="material-icons">save</i> Actualizar
+                        </button>
+                        <a href="{% url 'lista_roles' %}" class="btn btn-secondary">
+                            <i class="material-icons">cancel</i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function agregarPermiso() {
+    const disponibles = document.getElementById('permisosDisponibles');
+    const asignados = document.getElementById('permisosAsignados');
+    
+    if (disponibles.selectedIndex >= 0) {
+        const option = disponibles.options[disponibles.selectedIndex];
+        
+        // Agregar a la lista de asignados
+        const newOption = new Option(option.text, option.value);
+        asignados.add(newOption);
+        
+        // Quitar de disponibles
+        disponibles.remove(disponibles.selectedIndex);
+        
+        actualizarCamposOcultos();
+    }
+}
+
+function quitarPermiso() {
+    const disponibles = document.getElementById('permisosDisponibles');
+    const asignados = document.getElementById('permisosAsignados');
+    
+    if (asignados.selectedIndex >= 0) {
+        const option = asignados.options[asignados.selectedIndex];
+        
+        // Agregar a la lista de disponibles
+        const newOption = new Option(option.text, option.value);
+        disponibles.add(newOption);
+        
+        // Quitar de asignados
+        asignados.remove(asignados.selectedIndex);
+        
+        actualizarCamposOcultos();
+    }
+}
+
+function actualizarCamposOcultos() {
+    const asignados = document.getElementById('permisosAsignados');
+    const hiddenContainer = document.getElementById('permisosHidden');
+    
+    // Limpiar campos ocultos existentes
+    hiddenContainer.innerHTML = '';
+    
+    // Crear campos ocultos para cada permiso asignado
+    for (let i = 0; i < asignados.options.length; i++) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'permisos';
+        input.value = asignados.options[i].value;
+        hiddenContainer.appendChild(input);
+    }
+}
+
+// Inicializar campos ocultos al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarCamposOcultos();
+});
+</script>
+{% endblock %}
