@@ -63,7 +63,7 @@
                         <div>
                             <span id="contadorSeleccionados" class="text-muted">0 productos seleccionados</span>
                         </div>
-                        <button type="submit" class="btn btn-success btn-lg" id="realizarDespacho" disabled>
+                        <button type="button" class="btn btn-success btn-lg" id="realizarDespacho" disabled onclick="confirmarDespacho()">
                             <i class="material-icons">local_shipping</i> Realizar Despacho 
                         </button>
                     </div>
@@ -88,13 +88,13 @@
                                 <th>Despachado</th>
                                 <th>Pendiente</th>
                                 <th>Estado</th>
-                                <th>Detalles de Despachos</th>
+                                <th>Detalles</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for producto in productos_despachados %}
                             <tr>
-                                <td>{{ producto.producto.referencia }}</td>
+                                <td><strong>{{ producto.producto.referencia }}</strong></td>
                                 <td>{{ producto.cantidad }}</td>
                                 <td><span class="badge badge-success">{{ producto.despachado }}</span></td>
                                 <td>
@@ -119,12 +119,51 @@
                                     </button>
                                     <div class="collapse mt-2" id="detalles_{{ producto.id }}">
                                         <div class="card card-body">
-                                            {% for despacho in producto.despachos.all %}
-                                            <small>
-                                                📅 {{ despacho.fecha_despacho }} - 
-                                                Cantidad: <strong>{{ despacho.cantidad }}</strong>
-                                            </small><br>
-                                            {% endfor %}
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Fecha Despacho</th>
+                                                            <th>Cantidad</th>
+                                                            <th>Estado</th>
+                                                            <th>Fecha Reintegro</th>
+                                                            <th>Acción</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for despacho in producto.despachos.all %}
+                                                        <tr>
+                                                            <td><small>{{ despacho.fecha_despacho|date:"d/m/Y H:i" }}</small></td>
+                                                            <td><strong>{{ despacho.cantidad }}</strong></td>
+                                                            <td>
+                                                                {% if despacho.reintegro %}
+                                                                    <span class="badge badge-danger">REINTEGRADO</span>
+                                                                {% else %}
+                                                                    <span class="badge badge-success">ACTIVO</span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if despacho.reintegro %}
+                                                                    <small>{{ despacho.fecha_reintegro|date:"d/m/Y H:i" }}</small>
+                                                                {% else %}
+                                                                    <small class="text-muted">-</small>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if not despacho.reintegro %}
+                                                                <button type="button" class="btn btn-sm btn-warning" 
+                                                                        onclick="confirmarReintegro({{ despacho.id }})">
+                                                                    <i class="material-icons" style="font-size: 16px;">undo</i>
+                                                                </button>
+                                                                {% else %}
+                                                                <small class="text-muted">-</small>
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -144,6 +183,60 @@
                         <i class="material-icons">arrow_back</i> Volver a Búsqueda
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Despacho -->
+<div class="modal fade" id="modalConfirmarDespacho" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="material-icons">warning</i> Confirmar Despacho
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modalDespachoTexto"></p>
+                <p class="text-muted">Esta acción registrará los despachos seleccionados.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="ejecutarDespacho()">
+                    <i class="material-icons">local_shipping</i> Confirmar Despacho
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Reintegro -->
+<div class="modal fade" id="modalConfirmarReintegro" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="material-icons">warning</i> Confirmar Reintegro
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de reintegrar este despacho?</p>
+                <p class="text-danger"><strong>Esta acción no se puede deshacer.</strong></p>
+                <p class="text-muted">El producto volverá a estar disponible para despacho.</p>
+                <input type="hidden" id="reintegroId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="ejecutarReintegro()">
+                    <i class="material-icons">undo</i> Confirmar Reintegro
+                </button>
             </div>
         </div>
     </div>
@@ -218,8 +311,66 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Validación de cantidades en tiempo real
+    document.querySelectorAll('.cantidad-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const max = parseInt(this.getAttribute('max'));
+            const value = parseInt(this.value);
+            
+            if (value > max) {
+                this.value = max;
+                this.style.borderColor = '#f44336';
+                setTimeout(() => {
+                    this.style.borderColor = '';
+                }, 2000);
+            }
+        });
+    });
+
     // Estado inicial
     updateUI();
 });
+
+function confirmarDespacho() {
+    const checkedBoxes = document.querySelectorAll('.producto-checkbox:checked');
+    if (checkedBoxes.length === 0) return;
+    
+    document.getElementById('modalDespachoTexto').textContent = 
+        `¿Está seguro de realizar el despacho de ${checkedBoxes.length} producto(s)?`;
+    $('#modalConfirmarDespacho').modal('show');
+}
+
+function confirmarReintegro(despachoId) {
+    document.getElementById('reintegroId').value = despachoId;
+    $('#modalConfirmarReintegro').modal('show');
+}
+
+function ejecutarDespacho() {
+    // Validar cantidades antes de enviar
+    let valid = true;
+    const checkedBoxes = document.querySelectorAll('.producto-checkbox:checked');
+    
+    checkedBoxes.forEach(checkbox => {
+        const cantidadInput = document.querySelector(`input[name="cantidad_${checkbox.value}"]`);
+        const max = parseInt(cantidadInput.getAttribute('max'));
+        const value = parseInt(cantidadInput.value);
+        
+        if (value > max || value <= 0) {
+            valid = false;
+            cantidadInput.style.borderColor = '#f44336';
+        }
+    });
+    
+    if (valid) {
+        document.getElementById('despachoForm').submit();
+    } else {
+        alert('Error: Verifique las cantidades ingresadas.');
+    }
+}
+
+function ejecutarReintegro() {
+    const despachoId = document.getElementById('reintegroId').value;
+    window.location.href = `/despachos/reintegrar/${despachoId}/`;
+}
 </script>
 {% endblock %}

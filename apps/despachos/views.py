@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.utils import timezone
 from apps.ordenes_compra.models import OrdenCompra, ProductoSolicitado
 from .models import Despacho
 
@@ -23,6 +24,7 @@ def despacho_unificado(request, codigo_oc):
         productos_seleccionados = request.POST.getlist('productos_seleccionados')
         despachos_realizados = 0
         
+        errores = []
         for producto_id in productos_seleccionados:
             cantidad_str = request.POST.get(f'cantidad_{producto_id}')
             if cantidad_str:
@@ -30,17 +32,25 @@ def despacho_unificado(request, codigo_oc):
                     cantidad = int(cantidad_str)
                     producto = get_object_or_404(ProductoSolicitado, id=producto_id)
                     
-                    if cantidad > 0 and cantidad <= producto.pendiente:
+                    if cantidad <= 0:
+                        errores.append(f"{producto.producto.referencia}: La cantidad debe ser mayor a 0")
+                    elif cantidad > producto.pendiente:
+                        errores.append(f"{producto.producto.referencia}: No puede despachar {cantidad}, solo hay {producto.pendiente} pendientes")
+                    else:
                         Despacho.objects.create(
                             producto_solicitado=producto,
                             cantidad=cantidad
                         )
                         despachos_realizados += 1
                 except (ValueError, TypeError):
-                    continue
+                    errores.append(f"Producto {producto_id}: Cantidad inválida")
+        
+        if errores:
+            for error in errores:
+                messages.error(request, error)
         
         if despachos_realizados > 0:
-            messages.success(request, f"Se realizaron {despachos_realizados} despachos.")
+            messages.success(request, f"Se realizaron {despachos_realizados} despachos correctamente.")
     
     productos_pendientes = [p for p in orden.productos.all() if p.pendiente > 0]
     productos_despachados = [p for p in orden.productos.all() if p.despachado > 0]
@@ -50,3 +60,17 @@ def despacho_unificado(request, codigo_oc):
         'productos_pendientes': productos_pendientes,
         'productos_despachados': productos_despachados,
     })
+
+
+def reintegrar_despacho(request, despacho_id):
+    despacho = get_object_or_404(Despacho, id=despacho_id)
+    
+    if not despacho.reintegro:
+        despacho.reintegro = True
+        despacho.fecha_reintegro = timezone.now()
+        despacho.save()
+        messages.success(request, f"Despacho de {despacho.cantidad} unidades reintegrado.")
+    else:
+        messages.warning(request, "Este despacho ya fue reintegrado.")
+    
+    return redirect('despacho_unificado', codigo_oc=despacho.producto_solicitado.orden.codigo_oc)

@@ -23,8 +23,7 @@ class ProductoSolicitado(models.Model):
 
     @property
     def despachado(self):
-
-        return sum(d.cantidad for d in self.despachos.all())
+        return sum(d.cantidad for d in self.despachos.filter(reintegro=False))
 
     @property
     def pendiente(self):
@@ -33,8 +32,11 @@ class ProductoSolicitado(models.Model):
 
     @property
     def completado(self):
-
         return self.pendiente == 0
+
+    @property
+    def reintegrado(self):
+        return sum(d.cantidad for d in self.despachos.filter(reintegro=True))
 
     def __str__(self):
         return f'{self.producto.referencia} - Solicitado: {self.cantidad}, Despachado: {self.despachado}, Pendiente: {self.pendiente}'
