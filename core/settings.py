@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'apps.despachos',
 
     'apps.proyectos',
-    'apps.detalles_orden',
+    #'apps.detalles_orden',
 ]
 
 MIDDLEWARE = [

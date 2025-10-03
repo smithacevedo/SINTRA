@@ -1,0 +1,225 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Despacho - Orden {{ orden.codigo_oc }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Despacho  - Orden {{ orden.codigo_oc }}</h4>
+                <p class="card-category">Cliente: {{ orden.cliente.nombre_cliente }} | Fecha: {{ orden.fecha_solicitud }}</p>
+            </div>
+            <div class="card-body">
+                
+                <!-- Sección de Productos Pendientes -->
+                <h5 class="text-primary mb-3"> Productos Pendientes de Despacho</h5>
+                {% if productos_pendientes %}
+                <form method="post" id="despachoForm">
+                    {% csrf_token %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="5%">
+                                        <input type="checkbox" id="selectAll" style="transform: scale(1.2);">
+                                    </th>
+                                    <th>Referencia</th>
+                                    <th>Solicitado</th>
+                                    <th>Despachado</th>
+                                    <th>Pendiente</th>
+                                    <th>Cantidad a Despachar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos_pendientes %}
+                                {% if producto.pendiente > 0 %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="productos_seleccionados" 
+                                               value="{{ producto.id }}" 
+                                               class="producto-checkbox" 
+                                               style="transform: scale(1.2);">
+                                    </td>
+                                    <td><strong>{{ producto.producto.referencia }}</strong></td>
+                                    <td>{{ producto.cantidad }}</td>
+                                    <td>{{ producto.despachado }}</td>
+                                    <td><span class="badge badge-warning">{{ producto.pendiente }}</span></td>
+                                    <td>
+                                        <input type="number" name="cantidad_{{ producto.id }}" 
+                                               class="form-control cantidad-input" 
+                                               min="1" max="{{ producto.pendiente }}" 
+                                               value="{{ producto.pendiente }}" 
+                                               style="width: 100px;" disabled>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span id="contadorSeleccionados" class="text-muted">0 productos seleccionados</span>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg" id="realizarDespacho" disabled>
+                            <i class="material-icons">local_shipping</i> Realizar Despacho 
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="material-icons">info</i> No hay productos pendientes de despacho para esta orden.
+                </div>
+                {% endif %}
+
+                <hr class="my-4">
+
+                <!-- Sección de Productos Despachados -->
+                <h5 class="text-success mb-3"> Productos Despachados</h5>
+                {% if productos_despachados %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Referencia</th>
+                                <th>Solicitado</th>
+                                <th>Despachado</th>
+                                <th>Pendiente</th>
+                                <th>Estado</th>
+                                <th>Detalles de Despachos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos_despachados %}
+                            <tr>
+                                <td>{{ producto.producto.referencia }}</td>
+                                <td>{{ producto.cantidad }}</td>
+                                <td><span class="badge badge-success">{{ producto.despachado }}</span></td>
+                                <td>
+                                    {% if producto.pendiente > 0 %}
+                                        <span class="badge badge-warning">{{ producto.pendiente }}</span>
+                                    {% else %}
+                                        <span class="badge badge-success">0</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if producto.completado %}
+                                        <span class="badge badge-success">Completado</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">Parcial</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary" 
+                                            data-toggle="collapse" 
+                                            data-target="#detalles_{{ producto.id }}">
+                                        Ver Detalles
+                                    </button>
+                                    <div class="collapse mt-2" id="detalles_{{ producto.id }}">
+                                        <div class="card card-body">
+                                            {% for despacho in producto.despachos.all %}
+                                            <small>
+                                                📅 {{ despacho.fecha_despacho }} - 
+                                                Cantidad: <strong>{{ despacho.cantidad }}</strong>
+                                            </small><br>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="material-icons">info</i> Aún no se han realizado despachos para esta orden.
+                </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <a href="{% url 'buscar_orden' %}" class="btn btn-secondary">
+                        <i class="material-icons">arrow_back</i> Volver a Búsqueda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const productoCheckboxes = document.querySelectorAll('.producto-checkbox');
+    const realizarDespachoBtn = document.getElementById('realizarDespacho');
+    const contadorSeleccionados = document.getElementById('contadorSeleccionados');
+
+    // Función para actualizar el estado del botón y contador
+    function updateUI() {
+        const checkedBoxes = document.querySelectorAll('.producto-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        // Actualizar botón
+        realizarDespachoBtn.disabled = count === 0;
+        
+        // Actualizar contador
+        contadorSeleccionados.textContent = `${count} producto${count !== 1 ? 's' : ''} seleccionado${count !== 1 ? 's' : ''}`;
+        
+        // Actualizar estado del checkbox general
+        const totalCheckboxes = productoCheckboxes.length;
+        if (count === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (count === totalCheckboxes) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+
+    // Checkbox general - seleccionar/deseleccionar todos
+    selectAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        productoCheckboxes.forEach(checkbox => {
+            checkbox.checked = isChecked;
+            const cantidadInput = document.querySelector(`input[name="cantidad_${checkbox.value}"]`);
+            cantidadInput.disabled = !isChecked;
+            
+            // Efecto visual en la fila
+            const row = checkbox.closest('tr');
+            if (isChecked) {
+                row.classList.add('table-active');
+            } else {
+                row.classList.remove('table-active');
+            }
+        });
+        updateUI();
+    });
+
+    // Checkboxes individuales
+    productoCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const cantidadInput = document.querySelector(`input[name="cantidad_${this.value}"]`);
+            cantidadInput.disabled = !this.checked;
+            
+            // Efecto visual en la fila
+            const row = this.closest('tr');
+            if (this.checked) {
+                row.classList.add('table-active');
+            } else {
+                row.classList.remove('table-active');
+            }
+            
+            updateUI();
+        });
+    });
+
+    // Estado inicial
+    updateUI();
+});
+</script>
+{% endblock %}
