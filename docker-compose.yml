@@ -1,28 +1,34 @@
 version: '3.8'
 services:
-  appseed-app:
-    container_name: appseed_app
-    restart: always
-    env_file: .env
-    build: .
-    networks:
-      - db_network
-      - web_network
-  nginx:
-    container_name: nginx
-    restart: always
-    image: "nginx:latest"
-    ports:
-      - "85:85"
+  db:
+    image: postgres:14
+    # REMOVED: docker-compose configuration removed from repository.
+    # If you need docker-compose setup, generate or request a maintained version.
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - postgres_data:/var/lib/postgresql/data
     networks:
-      - web_network
-    depends_on: 
-      - appseed-app
+      - sintra-net
+
+  web:
+    build: .
+    # Ejecutar migraciones normales, collectstatic y arrancar Gunicorn.
+    command: sh -c "python manage.py migrate --no-input && python manage.py collectstatic --no-input && gunicorn core.wsgi:application -b 0.0.0.0:8000 --workers 3"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - DATABASE_URL=postgres://postgres:123@db:5432/sintra
+      - WKHTMLTOPDF_CMD=/usr/local/bin/wkhtmltopdf
+    depends_on:
+      - db
+    networks:
+      - sintra-net
+
+volumes:
+  postgres_data:
+
 networks:
-  db_network:
-    driver: bridge
-  web_network:
-    driver: bridge
+  sintra-net:
  

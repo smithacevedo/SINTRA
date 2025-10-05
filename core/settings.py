@@ -101,6 +101,9 @@ DATABASES = {
     },
 }
 
+# Ruta al ejecutable wkhtmltopdf (ajusta esta ruta según tu sistema)
+WKHTMLTOPDF_CMD = os.environ.get('WKHTMLTOPDF_CMD', '/usr/local/bin/wkhtmltopdf')
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 

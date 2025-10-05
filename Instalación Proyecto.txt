@@ -67,13 +67,10 @@ python manage.py runserver
 
 
 ---------------------------------------------
-# Correr desde Docker:
-docker-compose --version
-docker-compose pull && docker-compose build && docker-compose up -d
-o docker-compose pull; docker-compose build; docker-compose up -d
-
-
 ----------------------------------------------
+---------------------------------------------
+# Sección de ejecución con contenedores eliminada: este repositorio ahora se documenta para ejecución local sin Docker.
+
 
 # Crear nuevas aplicaciones:
 python manage.py startapp compras
@@ -127,3 +124,10 @@ python manage.py cities_light --force-import-all --progress
 
 # 3. Crear usuario admin (OBLIGATORIO)
 python crear_admin.py
+
+
+=== USUARIO ADMINISTRADOR ===
+Usuario: admin
+Contraseña: admin123
+Email: admin@sintra.com
+Acceso: COMPLETO

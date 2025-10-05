@@ -61,6 +61,9 @@
                                     <a href="{% url 'detalle_remision' remision.id %}" class="btn btn-sm btn-primary">
                                         <i class="material-icons">visibility</i> Ver Detalle
                                     </a>
+                                    <a href="{% url 'descargar_remision' remision.id %}" class="btn btn-sm btn-success" style="margin-left:6px;">
+                                        <i class="material-icons">download</i> Descargar PDF
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}

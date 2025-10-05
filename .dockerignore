@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+env
+.env
+*.sqlite3
+media
+node_modules
+.vscode
+.git
+.DS_Store
+# Docker build artifacts
+*.deb
