@@ -110,25 +110,6 @@ python crear_admin.py
 python manage.py runserver
 ```
 
-Producción recomendada (sugerida)
----------------------------------
-- Utiliza un servidor de aplicaciones (Gunicorn/uvicorn) detrás de un Reverse Proxy (Nginx) para TLS, compresión y servir estáticos.
-- Para media de usuarios usa un almacenamiento externo (S3/Azure Blob) y no el sistema de archivos local.
-- Construye y despliega tus artefactos (imágenes, paquetes o builds) según tu estrategia de CI/CD y el entorno de destino.
-
-wkhtmltopdf
------------
-- Asegúrate de tener `wkhtmltopdf` instalado en tu entorno si vas a usar `pdfkit`.
-- Alternativas: usar headless Chrome/Playwright o un servicio de conversión si deseas evitar dependencias nativas.
-
-Seguridad y variables de entorno
---------------------------------
-No comites secretos. Antes de desplegar asegúrate de configurar las siguientes variables de entorno en tu entorno de producción:
-
-- `SECRET_KEY` (clave secreta de Django)
-- `DEBUG=False` en producción
-- `DATABASE_URL` (p. ej. postgres://user:pass@host:port/dbname) — opcional si configuras `DATABASES` en `core/settings.py`
-- `WKHTMLTOPDF_CMD` si el ejecutable está en otra ruta
 
 Comandos útiles
 ---------------
@@ -150,53 +131,8 @@ python manage.py migrate
 python crear_admin.py
 ```
 
-Contacto y notas
-----------------
-Si necesitas que prepare instrucciones para despliegue con contenedores (Docker) o una configuración de `docker-compose` / `Dockerfile`, indícalo y la puedo generar. Actualmente el repositorio está documentado para ejecución local.
-
-Comandos rápidos: backup/restore (ejemplo local)
-------------------------------------------------
-- Volcar la base de datos a un archivo SQL en el host:
-
-```powershell
-pg_dump -U postgres -h localhost -d sintra > sintra_backup.sql
-```
-
-- Restaurar el dump en la base de datos local o remota:
-
-```powershell
-psql -U postgres -h localhost -d sintra < sintra_backup.sql
-```
 
 Notas importantes:
 - Los scripts SQL de inicialización (`scripts_permisos.sql`, `arreglar_secuencia.sql`) deben ejecutarse manualmente contra la base de datos si no usas un mecanismo de inicialización automatizado.
 - Ajusta `WKHTMLTOPDF_CMD` en `core/settings.py` si el ejecutable está en una ruta distinta.
-
-Desarrollo: cómo ajustar el código y probar cambios
--------------------------------------------------
-
-Flujo recomendado para editar, probar y subir cambios:
-
-1) Desarrollo local (virtualenv)
-
-```powershell
-.\env\Scripts\Activate
-pip install -r requirements.txt
-python manage.py makemigrations
-python manage.py migrate
-python manage.py runserver
-```
-
-2) Tests
-
-```powershell
-python manage.py test
-```
-
-Buenas prácticas
-----------------
-- No almacenar secretos en el repo; usar variables de entorno.
-- Versionar migraciones.
-- Hacer backup antes de operaciones destructivas en la BD.
-
 

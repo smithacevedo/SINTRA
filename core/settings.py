@@ -6,6 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 from decouple import config
 from unipath import Path
+import platform
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
@@ -94,15 +95,39 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sintra',
         'USER': 'postgres',
-       'PASSWORD': 'D3v3l0pm3nt',
-        #'PASSWORD': '123',
+       #'PASSWORD': 'D3v3l0pm3nt',
+        'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': 5432
     },
 }
 
-# Ruta al ejecutable wkhtmltopdf (ajusta esta ruta según tu sistema)
-WKHTMLTOPDF_CMD = os.environ.get('WKHTMLTOPDF_CMD', '/usr/local/bin/wkhtmltopdf')
+# Ruta al ejecutable wkhtmltopdf (SE DEBE MODIFICAR CUANDO SE DESPLIEGUE)
+# Buscamos primero una copia incluida en la carpeta `core/wkhtmltopdf` (útil en desarrollo):
+
+def _wkhtmltopdf_path():
+
+    # 1) La copia local dentro del mismo directorio `core` (donde está este settings.py)
+    core_dir = os.path.dirname(os.path.abspath(__file__))
+    system = platform.system()
+    candidates = []
+    if system == 'Windows':
+        candidates = [
+            os.path.join(core_dir, 'wkhtmltopdf', 'bin', 'wkhtmltopdf.exe'),
+            os.path.join(core_dir, 'wkhtmltopdf', 'wkhtmltopdf.exe'),
+        ]
+    else:
+        candidates = [
+            os.path.join(core_dir, 'wkhtmltopdf', 'bin', 'wkhtmltopdf'),
+            os.path.join(core_dir, 'wkhtmltopdf', 'wkhtmltopdf'),
+        ]
+
+    for p in candidates:
+        if os.path.exists(p) and os.access(p, os.X_OK):
+            return p
+
+
+WKHTMLTOPDF_CMD = _wkhtmltopdf_path()
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
