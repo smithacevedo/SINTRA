@@ -44,7 +44,7 @@
       </li>
       {% endif %}
       
-      {% if 'ver_pedidos' in x %}
+      {% if 'ver_pedidos' in permisos_usuario %}
       <li class="nav-item {% if 'ordenes' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_ordenes_compra' %}">
           <i class="material-icons">shopping_bag</i>
