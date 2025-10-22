@@ -1,281 +1,251 @@
-# [Material Dashboard Django](https://www.creative-tim.com/product/material-dashboard-django) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/home?status=Material%20Dashboard,%20a%20free%20Material%20Bootstrap%204%20Admin%20Template%20%E2%9D%A4%EF%B8%8F%20https%3A//bit.ly/2Lyat1Y%20%23bootstrap%20%23material%20%23design%20%23developers%20%23freebie%20%20via%20%40CreativeTim)
-
- ![version](https://img.shields.io/badge/version-1.0.1-blue.svg) [![GitHub issues open](https://img.shields.io/github/issues/creativetimofficial/material-dashboard-django.svg?maxAge=2592000)](https://github.com/creativetimofficial/material-dashboard-django/issues?q=is%3Aopen+is%3Aissue) [![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/creativetimofficial/material-dashboard-django.svg?maxAge=2592000)](https://github.com/creativetimofficial/material-dashboard-django/issues?q=is%3Aissue+is%3Aclosed) [![Join the chat at https://gitter.im/NIT-dgp/General](https://badges.gitter.im/NIT-dgp/General.svg)](https://gitter.im/creative-tim-general/Lobby) [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/E4aHAQy)
-
-![Material Dashboard Django - Admin Dashboard coded in Django.](https://github.com/creativetimofficial/material-dashboard-django/blob/master/media/material-dashboard-django-intro.gif)
-
-<br />
-
-> Free product - **Django Dashboard** starter project - Features:
-
-- Up-to-date [dependencies](./requirements.txt): **Django 3.2.6 LTS**
-- [SCSS compilation](#recompile-css) via **Gulp**
-- UI Kit: **Material Dashboard** (Free Version) provided by **[Creative-Tim](https://www.creative-tim.com/)**
-- Django Codebase - provided by **[AppSeed](https://appseed.us/)**
-- UI-Ready app, SQLite Database, Django Native ORM
-- Modular design, clean code-base
-- Session-Based Authentication, Forms validation
-- Deployment scripts: Docker, Gunicorn / Nginx
-
-<br />
-
-## Table of Contents
-
-* [Demo](#demo)
-* [Quick Start](#quick-start)
-* [Documentation](#documentation)
-* [File Structure](#file-structure)
-* [Browser Support](#browser-support)
-* [Resources](#resources)
-* [Reporting Issues](#reporting-issues)
-* [Technical Support or Questions](#technical-support-or-questions)
-* [Licensing](#licensing)
-* [Useful Links](#useful-links)
-
-<br />
-
-## Demo
-
-> To authenticate use the default credentials ***test / ApS12_ZZs8*** or create a new user on the [registration page](https://creativetim-django-dashboard-black-pro.appseed.us/register/).
-
-- **Material Dashboard Django** [Login Page](https://www.creative-tim.com/live/material-dashboard-django)
-
-<br />
-
-## Quick start
-
-> UNZIP the sources or clone the private repository. After getting the code, open a terminal and navigate to the working directory, with product source code.
-
 ```bash
-$ # Get the code
-$ git clone https://github.com/creativetimofficial/material-dashboard-django.git
-$ cd material-dashboard-django
-$
-$ # Virtualenv modules installation (Unix based systems)
-$ virtualenv env
-$ source env/bin/activate
-$
-$ # Virtualenv modules installation (Windows based systems)
-$ # virtualenv env
-$ # .\env\Scripts\activate
-$
-$ # Install modules - SQLite Storage
-$ pip3 install -r requirements.txt
-$
-$ # Create tables
-$ python manage.py makemigrations
-$ python manage.py migrate
-$
-$ # Start the application (development mode)
-$ python manage.py runserver # default port 8000
-$
-$ # Start the app - custom port
-$ # python manage.py runserver 0.0.0.0:<your_port>
-$
-$ # Access the web app in browser: http://127.0.0.1:8000/
-```
-
-> Note: To use the app, please access the registration page and create a new user. After authentication, the app will unlock the private pages.
-
-<br />
-
-## Documentation
-The documentation for the **Material Dashboard Django** is hosted at our [website](https://demos.creative-tim.com/material-dashboard-django/docs/1.0/getting-started/getting-started-django.html).
-
-<br />
-
-## File Structure
-Within the download you'll find the following directories and files:
-
-```bash
-< PROJECT ROOT >
+< SINTRA PROJECT ROOT >
    |
-   |-- core/                               # Implements app configuration
-   |    |-- settings.py                    # Defines Global Settings
-   |    |-- wsgi.py                        # Start the app in production
-   |    |-- urls.py                        # Define URLs served by all apps/nodes
+   |-- core/                               # Configuración principal de Django
+   |    |-- settings.py                    # Configuración global del proyecto
+   |    |-- wsgi.py                        # Servidor WSGI para producción
+   |    |-- urls.py                        # URLs principales del proyecto
+   |    |-- asgi.py                        # Servidor ASGI para aplicaciones async
    |
-   |-- apps/
+   |-- apps/                               # Aplicaciones del sistema SINTRA
    |    |
-   |    |-- home/                          # A simple app that serve HTML files
-   |    |    |-- views.py                  # Serve HTML pages for authenticated users
-   |    |    |-- urls.py                   # Define some super simple routes  
+   |    |-- authentication/                # Autenticación y autorización
+   |    |    |-- views.py                  # Vistas de login/registro
+   |    |    |-- urls.py                   # Rutas de autenticación
+   |    |    |-- forms.py                  # Formularios de auth
    |    |
-   |    |-- authentication/                # Handles auth routes (login and register)
-   |    |    |-- urls.py                   # Define authentication routes  
-   |    |    |-- views.py                  # Handles login and registration  
-   |    |    |-- forms.py                  # Define auth forms (login and register) 
+   |    |-- home/                          # Página principal y dashboard
+   |    |    |-- views.py                  # Vista del dashboard
+   |    |    |-- urls.py                   # Rutas principales
    |    |
-   |    |-- static/
-   |    |    |-- <css, JS, images>         # CSS files, Javascripts files
+   |    |-- clientes/                      # Gestión de clientes
+   |    |    |-- models.py                 # Modelo Cliente
+   |    |    |-- views.py                  # CRUD de clientes
+   |    |    |-- forms.py                  # Formularios de cliente
+   |    |    |-- urls.py                   # Rutas de clientes
    |    |
-   |    |-- templates/                     # Templates used to render pages
-   |         |-- includes/                 # HTML chunks and components
-   |         |    |-- navigation.html      # Top menu component
-   |         |    |-- sidebar.html         # Sidebar component
-   |         |    |-- footer.html          # App Footer
-   |         |    |-- scripts.html         # Scripts common to all pages
+   |    |-- productos/                     # Gestión de productos
+   |    |    |-- models.py                 # Modelo Producto
+   |    |    |-- views.py                  # CRUD de productos
+   |    |    |-- forms.py                  # Formularios de producto
+   |    |    |-- urls.py                   # Rutas de productos
+   |    |
+   |    |-- proveedores/                   # Gestión de proveedores
+   |    |    |-- models.py                 # Modelo Proveedor
+   |    |    |-- views.py                  # CRUD de proveedores
+   |    |    |-- forms.py                  # Formularios de proveedor
+   |    |    |-- urls.py                   # Rutas de proveedores
+   |    |
+   |    |-- proyectos/                     # Gestión de proyectos
+   |    |    |-- models.py                 # Modelo Proyecto
+   |    |    |-- views.py                  # CRUD de proyectos
+   |    |    |-- forms.py                  # Formularios de proyecto
+   |    |    |-- urls.py                   # Rutas de proyectos
+   |    |
+   |    |-- ordenes_compra/                # Órdenes de compra
+   |    |    |-- models.py                 # Modelos OrdenCompra, DetalleOrden
+   |    |    |-- views.py                  # CRUD de órdenes
+   |    |    |-- forms.py                  # Formularios de órdenes
+   |    |    |-- urls.py                   # Rutas de órdenes
+   |    |
+   |    |-- remisiones/                    # Remisiones de productos
+   |    |    |-- models.py                 # Modelos Remision, DetalleRemision
+   |    |    |-- views.py                  # Gestión de remisiones
+   |    |    |-- urls.py                   # Rutas de remisiones
+   |    |
+   |    |-- despachos/                     # Control de despachos
+   |    |    |-- models.py                 # Modelo Despacho
+   |    |    |-- views.py                  # Gestión de despachos
+   |    |    |-- urls.py                   # Rutas de despachos
+   |    |
+   |    |-- usuarios/                      # Gestión de usuarios del sistema
+   |    |    |-- models.py                 # Modelo Usuario personalizado
+   |    |    |-- views.py                  # CRUD de usuarios
+   |    |    |-- forms.py                  # Formularios de usuario
+   |    |    |-- middleware.py             # Middleware personalizado
+   |    |    |-- urls.py                   # Rutas de usuarios
+   |    |
+   |    |-- roles/                         # Sistema de roles
+   |    |    |-- models.py                 # Modelo Rol
+   |    |    |-- views.py                  # Gestión de roles
+   |    |    |-- forms.py                  # Formularios de roles
+   |    |    |-- urls.py                   # Rutas de roles
+   |    |
+   |    |-- permisos/                      # Sistema de permisos
+   |    |    |-- models.py                 # Modelo Permiso
+   |    |    |-- views.py                  # Gestión de permisos
+   |    |    |-- forms.py                  # Formularios de permisos
+   |    |    |-- urls.py                   # Rutas de permisos
+   |    |
+   |    |-- utils/                         # Utilidades del sistema
+   |    |    |-- context_processors.py     # Procesadores de contexto
+   |    |    |-- mixins.py                 # Mixins reutilizables
+   |    |    |-- permisos.py               # Decoradores de permisos
+   |    |
+   |    |-- static/                        # Archivos estáticos
+   |    |    |-- assets/                   # CSS, JS, imágenes
+   |    |
+   |    |-- templates/                     # Plantillas HTML
+   |         |-- layouts/                  # Plantillas base
+   |         |    |-- base.html            # Layout principal
+   |         |    |-- base-fullscreen.html # Layout pantalla completa
    |         |
-   |         |-- layouts/                   # Master pages
-   |         |    |-- base-fullscreen.html  # Used by Authentication pages
-   |         |    |-- base.html             # Used by common pages
+   |         |-- includes/                 # Componentes reutilizables
+   |         |    |-- navigation.html      # Menú de navegación
+   |         |    |-- sidebar.html         # Barra lateral
+   |         |    |-- footer.html          # Pie de página
+   |         |    |-- scripts.html         # Scripts comunes
    |         |
-   |         |-- accounts/                  # Authentication pages
-   |         |    |-- login.html            # Login page
-   |         |    |-- register.html         # Register page
-   |         |
-   |         |-- home/                      # UI Kit Pages
-   |              |-- index.html            # Index page
-   |              |-- 404-page.html         # 404 page
-   |              |-- *.html                # All other pages
+   |         |-- accounts/                 # Páginas de autenticación
+   |         |-- home/                     # Páginas principales
+   |         |-- clientes/                 # Templates de clientes
+   |         |-- productos/                # Templates de productos
+   |         |-- proveedores/              # Templates de proveedores
+   |         |-- proyectos/                # Templates de proyectos
+   |         |-- ordenes_compra/           # Templates de órdenes
+   |         |-- remisiones/               # Templates de remisiones
+   |         |-- despachos/                # Templates de despachos
+   |         |-- usuarios/                 # Templates de usuarios
+   |         |-- roles/                    # Templates de roles
+   |         |-- permisos/                 # Templates de permisos
+   |         |-- EXCEL/                    # Templates para Excel
    |
-   |-- requirements.txt                     # Development modules - SQLite storage
+   |-- media/                              # Archivos multimedia
+   |-- staticfiles/                        # Archivos estáticos compilados
+   |-- nginx/                              # Configuración Nginx
    |
-   |-- .env                                 # Inject Configuration via Environment
-   |-- manage.py                            # Start the app - Django default start script
-   |
-   |-- ************************************************************************
+   |-- requirements.txt                    # Dependencias Python
+   |-- .env                                # Variables de entorno
+   |-- manage.py                           # Script de gestión Django
+   |-- crear_admin.py                      # Script para crear admin
+   |-- scripts_permisos.sql                # Script de permisos SQL
+   |-- limpiar_permisos.sql                # Script limpieza permisos
+   |-- arreglar_secuencia.sql              # Script arreglo secuencias
+   |-- clear_migrations.py                 # Script limpiar migraciones
+   |-- gunicorn-cfg.py                     # Configuración Gunicorn
 ```
 
-<br />
 
-> The bootstrap flow
-
-- Django bootstrapper `manage.py` uses `core/settings.py` as the main configuration file
-- `core/settings.py` loads the app magic from `.env` file
-- Redirect the guest users to Login page
-- Unlock the pages served by *app* node for authenticated users
-
-<br />
-
-## Recompile CSS
-
-To recompile SCSS files, follow this setup:
-
-<br />
-
-**Step #1** - Install tools
-
-- [NodeJS](https://nodejs.org/en/) 12.x or higher
-- [Gulp](https://gulpjs.com/) - globally 
-    - `npm install -g gulp-cli`
-- [Yarn](https://yarnpkg.com/) (optional) 
-
-<br />
-
-**Step #2** - Change the working directory to `assets` folder
-
-```bash
-$ cd apps/static/assets
-```
-
-<br />
-
-**Step #3** - Install modules (this will create a classic `node_modules` directory)
-
-```bash
-$ npm install
-// OR
-$ yarn
-```
-
-<br />
-
-**Step #4** - Edit & Recompile SCSS files 
-
-```bash
-$ gulp scss
-```
-
-The generated file is saved in `static/assets/css` directory.
-
-<br /> 
-
-## Deployment
-
-The app is provided with a basic configuration to be executed in [Docker](https://www.docker.com/), [Gunicorn](https://gunicorn.org/), and [Waitress](https://docs.pylonsproject.org/projects/waitress/en/stable/).
-
-### [Docker](https://www.docker.com/) execution
----
-
-The application can be easily executed in a docker container. The steps:
-
-> Get the code
-
-```bash
-$ git clone https://github.com/creativetimofficial/material-dashboard-django.git
-$ cd material-dashboard-django
-```
-
-> Start the app in Docker
-
-```bash
-$ sudo docker-compose pull && sudo docker-compose build && sudo docker-compose up -d
-```
-
-Visit `http://localhost:85` in your browser. The app should be up & running.
-
-<br />
-
-## Browser Support
-
-At present, we officially aim to support the last two versions of the following browsers:
-
-<img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/chrome.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/firefox.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/edge.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/safari.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/opera.png" width="64" height="64">
-
-<br />
-
-## Resources
-
-- Demo: <https://www.creative-tim.com/live/material-dashboard-django>
-- Download Page: <https://www.creative-tim.com/product/material-dashboard-django>
-- Documentation: <https://demos.creative-tim.com/material-dashboard-django/docs/1.0/getting-started/getting-started-django.html>
-- License Agreement: <https://www.creative-tim.com/license>
-- Support: <https://www.creative-tim.com/contact-us>
-- Issues: [Github Issues Page](https://github.com/creativetimofficial/material-dashboard-django/issues)
-
-<br />
-
-## Reporting Issues
-
-We use GitHub Issues as the official bug tracker for the **Material Dashboard Django**. Here are some advices for our users that want to report an issue:
-
-1. Make sure that you are using the latest version of the **Material Dashboard Django**. Check the CHANGELOG from your dashboard on our [website](https://www.creative-tim.com/).
-2. Providing us reproducible steps for the issue will shorten the time it takes for it to be fixed.
-3. Some issues may be browser-specific, so specifying in what browser you encountered the issue might help.
-
-<br />
-
-## Technical Support or Questions
-
-If you have questions or need help integrating the product please [contact us](https://www.creative-tim.com/contact-us) instead of opening an issue.
-
-<br />
 
 ## Licensing
 
 - Copyright 2019 - present [Creative Tim](https://www.creative-tim.com/)
 - Licensed under [Creative Tim EULA](https://www.creative-tim.com/license)
 
-<br />
-
-## Useful Links
-
-- [More products](https://www.creative-tim.com/bootstrap-themes) from Creative Tim
-- [Tutorials](https://www.youtube.com/channel/UCVyTG4sCw-rOvB9oHkzZD1w)
-- [Freebies](https://www.creative-tim.com/bootstrap-themes/free) from Creative Tim
-- [Affiliate Program](https://www.creative-tim.com/affiliates/new) (earn money)
-
-<br />
-
-## Social Media
-
-- Twitter: <https://twitter.com/CreativeTim>
-- Facebook: <https://www.facebook.com/CreativeTim>
-- Dribbble: <https://dribbble.com/creativetim>
-- Instagram: <https://www.instagram.com/CreativeTimOfficial>
-
-<br />
 
 ---
 [Material Dashboard Django](https://www.creative-tim.com/product/material-dashboard-django) - Provided by [Creative Tim](https://www.creative-tim.com/) and [AppSeed](https://appseed.us)
+
+# SINTRA — Instrucciones de despliegue y ejecución
+
+SINTRA es un sistema integral de gestión empresarial desarrollado en Django que incluye:
+
+- **Gestión de Clientes**: Registro y administración de información de clientes
+- **Gestión de Productos**: Catálogo de productos con códigos y especificaciones
+- **Gestión de Proveedores**: Administración de proveedores y contactos
+- **Gestión de Proyectos**: Control de proyectos empresariales
+- **Órdenes de Compra**: Creación y seguimiento de órdenes de compra
+- **Remisiones**: Generación de remisiones con exportación a Excel
+- **Control de Despachos**: Seguimiento de entregas y despachos
+- **Sistema de Usuarios**: Gestión completa de usuarios con roles y permisos
+- **Sistema de Roles y Permisos**: Control granular de accesos
+
+Este README describe cómo ejecutar y desplegar la aplicación en entornos de desarrollo y producción.
+
+## Contenido
+- [Requisitos previos](#requisitos-previos)
+- [Ejecutar localmente](#ejecutar-localmente-sin-docker)
+- [Comandos útiles](#comandos-útiles)
+- [Funcionalidades principales](#funcionalidades-principales)
+- [Estructura del proyecto](#estructura-del-proyecto)
+
+Requisitos previos
+------------------
+- Python 3.11
+- PostgreSQL
+
+Ejecutar localmente (sin Docker)
+--------------------------------
+1. Crear y activar un virtualenv:
+
+```powershell
+python -m venv env
+.\env\Scripts\Activate
+```
+
+2. Instalar dependencias:
+
+```powershell
+pip install -r requirements.txt
+```
+
+3. Configurar `core/settings.py` o exportar la variable de entorno `DATABASE_URL` apuntando a PostgreSQL.
+
+4. Migraciones y crear usuario admin:
+
+```powershell
+python manage.py makemigrations
+python manage.py migrate
+psql -U postgres -d sintra -f limpiar_permisos.sql
+psql -U postgres -d sintra -f arreglar_secuencia.sql
+psql -U postgres -d sintra -f scripts_permisos.sql
+python crear_admin.py
+```
+
+5. Correr servidor de desarrollo:
+
+```powershell
+python manage.py runserver
+```
+
+
+Comandos útiles
+---------------
+- Instalar dependencias:
+
+```powershell
+pip install -r requirements.txt
+```
+
+- Ejecutar migraciones:
+
+```powershell
+python manage.py migrate
+```
+
+- Crear usuario admin:
+
+```powershell
+python crear_admin.py
+```
+
+
+## Funcionalidades Principales
+
+### Módulos Implementados
+- ✅ **Autenticación**: Login/logout con sistema de sesiones
+- ✅ **Dashboard**: Página principal con resumen del sistema
+- ✅ **Clientes**: CRUD completo con búsqueda y filtros
+- ✅ **Productos**: Gestión de catálogo de productos
+- ✅ **Proveedores**: Administración de proveedores
+- ✅ **Proyectos**: Control de proyectos empresariales
+- ✅ **Órdenes de Compra**: Creación y gestión de órdenes
+- ✅ **Remisiones**: Generación con exportación Excel
+- ✅ **Despachos**: Control de entregas
+- ✅ **Usuarios**: Sistema completo de usuarios
+- ✅ **Roles y Permisos**: Control de accesos granular
+
+### Características Técnicas
+- **Base de Datos**: PostgreSQL
+- **Framework**: Django 4.x
+- **Frontend**: Material Dashboard (Bootstrap)
+- **Exportación**: Excel (openpyxl)
+- **Autenticación**: Sistema Django personalizado
+- **Permisos**: Sistema de roles y permisos granular
+
+## Notas Importantes
+- Los scripts SQL de inicialización (`scripts_permisos.sql`, `arreglar_secuencia.sql`, `limpiar_permisos.sql`) deben ejecutarse manualmente contra la base de datos
+- El sistema incluye middleware personalizado para control de permisos
+- Las remisiones se pueden exportar a Excel (funcionalidad PDF removida)
+- El sistema utiliza un modelo de usuario personalizado
+

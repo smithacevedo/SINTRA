@@ -7,12 +7,13 @@
 
 {% block content %}
 
-  <div class="row">
+
+  <div class="row" class="sidebar" data-color="purple">
     <div class="col-md-5">
       <div class="card">
         <div class="card-header card-header-primary">
           <h4 class="card-title">
-            Login
+            Inicio de Sesi&oacute;n
           </h4>
         </div>
         <div class="card-body">
@@ -21,7 +22,7 @@
               {% if msg %}
                 <span class="text-danger">{{ msg | safe }}</span>
               {% else %}
-                  Add your credentials
+                  A&ntilde;ade tus credenciales
               {% endif %}  
           </h6>
           
@@ -34,8 +35,8 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
-                  <label class="bmd-label-floating">Username</label>
-                  {{ form.username }}
+                  <label class="bmd-label-floating">Usuario</label>
+                  <input type="text" name="username" class="form-control">
                 </div>
               </div>
             </div>
@@ -45,20 +46,18 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
-                  <label class="bmd-label-floating">Password</label>
-                  {{ form.password }}
+                  <label class="bmd-label-floating">Contrase&ntilde;a</label>
+                  <input type="password" name="password" class="form-control">
                 </div>
               </div>
             </div>
 
             <br />
 
-            <button type="submit" name="login" class="btn btn-primary pull-left">Login</button>
+            <button type="submit" name="login" class="btn btn-primary pull-left">Iniciar Sesi&oacute;n</button>
 
             &nbsp; &nbsp; 
-            <span class="pull-right">
-              ¿No tienes una cuenta? <a href="{% url 'register' %}" class="text-primary">Create</a>
-            </span>
+
 
             <div class="clearfix"></div>
 

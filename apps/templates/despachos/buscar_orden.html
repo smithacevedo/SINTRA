@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Buscar Orden{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+  <div class="col-md-6 offset-md-3">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Buscar Orden para Despacho</h4>
+        <p class="card-category">Ingrese el código de la orden de compra para gestionar despachos</p>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="codigo_oc">Código de Orden</label>
+            <input type="text" name="codigo_oc" id="codigo_oc" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary pull-right">Consultar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

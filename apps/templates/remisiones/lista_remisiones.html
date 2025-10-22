@@ -1,0 +1,89 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Remisiones{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Lista de Remisiones</h4>
+                <p class="card-category">Todas las remisiones generadas</p>
+            </div>
+            <div class="card-body">
+                <!-- Campo de búsqueda -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <form method="get" class="form-inline">
+                            <div class="input-group">
+                                <input type="text" name="buscar" class="form-control" 
+                                       style="width: 250px;" 
+                                       placeholder="Buscar por número de remisión..." 
+                                       value="{{ buscar }}">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="material-icons">search</i>
+                                    </button>
+                                    {% if buscar %}
+                                    <a href="{% url 'lista_remisiones' %}" class="btn btn-secondary">
+                                        <i class="material-icons">clear</i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                {% if remisiones %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Número Remisión</th>
+                                <th>Orden</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Productos</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for remision in remisiones %}
+                            <tr>
+                                <td><strong>{{ remision.numero_remision }}</strong></td>
+                                <td>{{ remision.orden.codigo_oc }}</td>
+                                <td>{{ remision.orden.cliente.nombre_cliente }}</td>
+                                <td>{{ remision.fecha_remision|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <span class="badge badge-info">{{ remision.detalles.count }} productos</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'detalle_remision' remision.id %}" class="btn btn-sm btn-primary">
+                                        <i class="material-icons">visibility</i> Ver Detalle
+                                    </a>
+                                    <!-- Botón de Descargar PDF eliminado del proyecto -->
+                                    <a href="{% url 'descargar_remision_excel' remision.id %}" class="btn btn-sm btn-success" style="margin-left:6px;">
+                                        <i class="material-icons">file_download</i> Descargar Excel
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="material-icons">info</i> 
+                    {% if buscar %}
+                        No se encontraron remisiones con "{{ buscar }}".
+                    {% else %}
+                        No hay remisiones registradas.
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Lista Proveedores {% endblock %}
+
+{% block stylesheets %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-plain">
+            <div class="card-header card-header-primary d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="card-title mt-0">Lista de Proveedores</h4>
+                    <p class="card-category">Aquí puedes ver todos los proveedores registrados</p>
+                </div>
+                {% if 'crear_productos' in permisos_usuario and not solo_lectura %}
+                <a href="{% url 'agregar_proveedores' %}" class="btn btn-secondary">Agregar Proveedor</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-primary">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>NIT</th>
+                                <th>Teléfono</th>
+                                <th>Correo</th>
+                                <th>Dirección</th>
+                                <th>Productos que suministra</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for proveedor in proveedores %}
+                            <tr>
+                                <td>{{ proveedor.nombre }}</td>
+                                <td>{{ proveedor.nit }}</td>
+                                <td>{{ proveedor.telefono }}</td>
+                                <td>{{ proveedor.correo }}</td>
+                                <td>{{ proveedor.direccion }}</td>
+                                <td>{{ proveedor.productos_suministra }}</td>
+                                <td class="td-actions text-right">
+                                    {% if 'editar_productos' in permisos_usuario and not solo_lectura %}
+                                    <a href="{% url 'editar_proveedores' proveedor.id %}" rel="tooltip" class="btn btn-primary btn-link btn-sm">
+                                        <i class="material-icons">edit</i>
+                                    </a>
+                                    {% endif %}
+                                    {% if 'eliminar_productos' in permisos_usuario and not solo_lectura %}
+                                    <button type="button" class="btn btn-danger btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ proveedor.id }}">
+                                        <i class="material-icons">delete</i>
+                                    </button>
+                                    {% endif %}
+                                    {% if solo_lectura %}
+                                    <span class="text-muted">Solo lectura</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Modal de confirmación -->
+                                <div class="modal fade" id="confirmDeleteModal{{ proveedor.id }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ proveedor.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ proveedor.id }}">Confirmar Eliminación</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Estás seguro de que deseas eliminar al proveedor <strong>{{ proveedor.nombre }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form method="post" action="{% url 'eliminar_proveedores' proveedor.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Fin del modal -->
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No hay proveedores registrados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

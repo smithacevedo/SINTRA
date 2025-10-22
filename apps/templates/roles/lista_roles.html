@@ -1,0 +1,76 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Roles{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Gestión de Roles</h4>
+                <p class="card-category">Administrar roles y permisos del sistema</p>
+            </div>
+            <div class="card-body">
+                {% if 'crear_roles' in permisos_usuario and not solo_lectura %}
+                <div class="mb-3">
+                    <a href="{% url 'crear_rol' %}" class="btn btn-primary">
+                        <i class="material-icons">add</i> Nuevo Rol
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if roles %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Permisos</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rol in roles %}
+                            <tr>
+                                <td>{{ rol.id }}</td>
+                                <td><strong>{{ rol.nombre }}</strong></td>
+                                <td>
+                                    {% for permiso in rol.permisos.all %}
+                                        <span class="badge badge-info">{{ permiso.nombre }}</span>
+                                    {% empty %}
+                                        <span class="text-muted">Sin permisos</span>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% if 'editar_roles' in permisos_usuario and not solo_lectura %}
+                                    <a href="{% url 'editar_rol' rol.id %}" class="btn btn-sm btn-warning">
+                                        <i class="material-icons">edit</i>
+                                    </a>
+                                    {% endif %}
+                                    {% if 'eliminar_roles' in permisos_usuario and not solo_lectura %}
+                                    <a href="{% url 'eliminar_rol' rol.id %}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('¿Está seguro de eliminar este rol?')">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                    {% endif %}
+                                    {% if solo_lectura %}
+                                    <span class="text-muted">Solo lectura</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="material-icons">info</i> No hay roles registrados.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

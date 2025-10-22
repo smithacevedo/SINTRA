@@ -1,0 +1,137 @@
+from django.shortcuts import redirect, get_object_or_404, render
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import ListView, CreateView, UpdateView
+from django.contrib import messages
+from apps.clientes.models import Clientes
+from apps.proyectos.models import Proyectos
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.utils.permisos import requiere_permiso, tiene_permiso
+from django.utils.decorators import method_decorator
+
+from .models import OrdenCompra, ProductoSolicitado
+from .forms import OrdenCompraForm, ProductoFormSet
+
+
+class ListaOrdenesCompraView(ListView):
+    model = OrdenCompra
+    template_name = 'ordenes_compra/lista_ordenes_compra.html'
+    context_object_name = 'ordenes'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        if not tiene_permiso(request.user, 'ver_pedidos'):
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['segment'] = 'ordenes'
+        context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_pedidos') or 
+                                      tiene_permiso(self.request.user, 'editar_pedidos') or 
+                                      tiene_permiso(self.request.user, 'eliminar_pedidos'))
+        return context
+
+
+@method_decorator(requiere_permiso('crear_pedidos'), name='dispatch')
+class AgregarOrdenCompraView(LoginRequiredMixin, CreateView):
+    model = OrdenCompra
+    form_class = OrdenCompraForm
+    template_name = 'ordenes_compra/agregar_orden_compra.html'
+    success_url = reverse_lazy('lista_ordenes_compra')
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        formset = ProductoFormSet(prefix='productosolicitado_set')
+        clientes_flags = {str(c.id): c.tiene_proyectos for c in Clientes.objects.all()}
+        proyectos_by_cliente = {}
+        for p in Proyectos.objects.select_related('cliente').all():
+            proyectos_by_cliente.setdefault(str(p.cliente_id), []).append({'id': p.id, 'nombre': p.nombre_proyecto})
+        return render(request, self.template_name, {
+            'form': form,
+            'formset': formset,
+            'segment': 'ordenes',
+            'clientes_flags': clientes_flags,
+            'proyectos_by_cliente': proyectos_by_cliente,
+        })
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        formset = ProductoFormSet(request.POST, prefix='productosolicitado_set')
+        clientes_flags = {str(c.id): c.tiene_proyectos for c in Clientes.objects.all()}
+        proyectos_by_cliente = {}
+        for p in Proyectos.objects.select_related('cliente').all():
+            proyectos_by_cliente.setdefault(str(p.cliente_id), []).append({'id': p.id, 'nombre': p.nombre_proyecto})
+
+        if form.is_valid() and formset.is_valid():
+            orden = form.save()
+            productos = formset.save(commit=False)
+            for p in productos:
+                p.orden = orden
+                p.save()
+            messages.success(request, 'La orden de compra ha sido registrada exitosamente.')
+            return redirect(self.success_url)
+
+        messages.error(request, 'Por favor, corrija los errores en el formulario.')
+        return render(request, self.template_name, {
+            'form': form,
+            'formset': formset,
+            'segment': 'ordenes',
+            'clientes_flags': clientes_flags,
+            'proyectos_by_cliente': proyectos_by_cliente,
+        }, status=400)
+
+
+@method_decorator(requiere_permiso('editar_pedidos'), name='dispatch')
+class EditarOrdenCompraView(LoginRequiredMixin, UpdateView):
+    model = OrdenCompra
+    form_class = OrdenCompraForm
+    template_name = 'ordenes_compra/editar_orden_compra.html'
+    success_url = reverse_lazy('lista_ordenes_compra')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = ProductoFormSet(
+                self.request.POST, 
+                instance=self.object, 
+                prefix='productosolicitado_set'
+            )
+        else:
+            context['formset'] = ProductoFormSet(
+                instance=self.object, 
+                prefix='productosolicitado_set'
+            )
+        clientes_flags = {str(c.id): c.tiene_proyectos for c in Clientes.objects.all()}
+        proyectos_by_cliente = {}
+        for p in Proyectos.objects.select_related('cliente').all():
+            proyectos_by_cliente.setdefault(str(p.cliente_id), []).append({'id': p.id, 'nombre': p.nombre_proyecto})
+        context['clientes_flags'] = clientes_flags
+        context['proyectos_by_cliente'] = proyectos_by_cliente
+        context['segment'] = 'ordenes'
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+            messages.success(self.request, 'La orden de compra ha sido actualizada correctamente.')
+            return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Por favor, corrija los errores en el formulario.')
+        return self.render_to_response(self.get_context_data(form=form), status=400)
+
+
+@method_decorator(requiere_permiso('eliminar_pedidos'), name='dispatch')
+class EliminarOrdenCompraView(LoginRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        orden = get_object_or_404(OrdenCompra, pk=pk)
+        orden.delete()
+        messages.success(request, f'La orden de compra del cliente "{orden.cliente.nombre_cliente}" ha sido eliminada.')
+        return redirect('lista_ordenes_compra')

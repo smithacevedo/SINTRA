@@ -1,0 +1,115 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Editar Proveedor {% endblock %}
+
+{% block stylesheets %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Editar Proveedor</h4>
+                <p class="card-category">Modifique la información del proveedor</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Nombre del proveedor</label>
+                                <input type="text" class="form-control" name="nombre" value="{{ form.nombre.value|default_if_none:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">NIT</label>
+                                <input type="text" class="form-control" name="nit" value="{{ form.nit.value|default_if_none:'' }}" required>
+                                 {% if form.nit.errors %}
+                                <div class="text-danger">
+                                    {{ form.nit.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Teléfono</label>
+                                <input type="text" class="form-control" name="telefono" value="{{ form.telefono.value|default_if_none:'' }}" required>
+                                {% if form.telefono.errors %}
+                                <div class="text-danger">
+                                    {{ form.telefono.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Correo electrónico</label>
+                                <input type="email" class="form-control" name="correo" value="{{ form.correo.value|default_if_none:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Dirección</label>
+                                <input type="text" class="form-control" name="direccion" value="{{ form.direccion.value|default_if_none:'' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Productos que suministra</label>
+                                <textarea class="form-control" name="productos_suministra" rows="3">{{ form.productos_suministra.value|default_if_none:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary pull-right">Guardar Cambios</button>
+                    <a href="{% url 'lista_proveedores' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        $('.select2').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true
+        });
+    });
+</script>
+{% endblock javascripts %}

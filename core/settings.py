@@ -6,6 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 import os
 from decouple import config
 from unipath import Path
+import platform
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).parent
@@ -20,6 +21,9 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # load production server from .env
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
 
+# Todos los proyecto usen BigAutoField por defecto
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -29,8 +33,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap4',
     'apps.home',
-    'apps.compras'
+    'apps.productos',
+    'apps.clientes',
+    'cities_light',
+    'apps.ordenes_compra',
+    'apps.proveedores',
+    'apps.despachos',
+    'apps.remisiones',
+    'apps.permisos',
+    'apps.roles',
+    'apps.usuarios',
+    'apps.proyectos',
+    #'apps.detalles_orden',
 ]
 
 MIDDLEWARE = [
@@ -40,8 +56,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.usuarios.middleware.PrimerAccesoMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -60,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.utils.context_processors.permisos_usuario',
             ],
         },
     },
@@ -75,11 +95,39 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sintra',
         'USER': 'postgres',
-        'PASSWORD': '123',
+       'PASSWORD': 'D3v3l0pm3nt',
+       # 'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': 5432
     },
 }
+
+# Ruta al ejecutable wkhtmltopdf (SE DEBE MODIFICAR CUANDO SE DESPLIEGUE)
+# Buscamos primero una copia incluida en la carpeta `core/wkhtmltopdf` (útil en desarrollo):
+
+def _wkhtmltopdf_path():
+
+    # 1) La copia local dentro del mismo directorio `core` (donde está este settings.py)
+    core_dir = os.path.dirname(os.path.abspath(__file__))
+    system = platform.system()
+    candidates = []
+    if system == 'Windows':
+        candidates = [
+            os.path.join(core_dir, 'wkhtmltopdf', 'bin', 'wkhtmltopdf.exe'),
+            os.path.join(core_dir, 'wkhtmltopdf', 'wkhtmltopdf.exe'),
+        ]
+    else:
+        candidates = [
+            os.path.join(core_dir, 'wkhtmltopdf', 'bin', 'wkhtmltopdf'),
+            os.path.join(core_dir, 'wkhtmltopdf', 'wkhtmltopdf'),
+        ]
+
+    for p in candidates:
+        if os.path.exists(p) and os.access(p, os.X_OK):
+            return p
+
+
+WKHTMLTOPDF_CMD = _wkhtmltopdf_path()
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -102,9 +150,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-mx'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
@@ -127,4 +175,7 @@ STATICFILES_DIRS = (
 
 
 #############################################################
+# Cities Light settings
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['es']  # Idioma de las ciudades
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['CO']  # Solo cargar ciudades de Colombia
 #############################################################

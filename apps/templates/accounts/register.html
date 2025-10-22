@@ -21,7 +21,7 @@
               {% if msg %}
                 <span class="text-danger">{{ msg | safe }}</span>
               {% else %}
-                Add your credentials
+                A&ntilde;ade tus credenciales
               {% endif %}  
           </h6>
           
@@ -30,7 +30,7 @@
           {% if success %}
 
             <p class="">
-              Please <a href="{% url 'login' %}" class="text-black text-small">authenticate</a> using the new account.
+              Por favor <a href="{% url 'login' %}" class="text-black text-small">autenticate</a> usando la nueva cuenta.
             </p>  
 
           {% else %}
@@ -41,7 +41,7 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label class="bmd-label-floating">Username</label>
+                    <label class="bmd-label-floating">Usuario</label>
                     {{ form.username }}
                   </div>
                 </div>
@@ -65,7 +65,7 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label class="bmd-label-floating">Password</label>
+                    <label class="bmd-label-floating">Contrase&ntilde;a</label>
                     {{ form.password1 }}
                   </div>
                 </div>
@@ -77,7 +77,7 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label class="bmd-label-floating">Password Check</label>
+                    <label class="bmd-label-floating">Confirmar Contrase&ntilde;a</label>
                     {{ form.password2 }}
                   </div>
                 </div>
@@ -86,11 +86,11 @@
 
               <br />
 
-              <button type="submit" name="register" class="btn btn-primary pull-left">Register</button>
+              <button type="submit" name="register" class="btn btn-primary pull-left">Registrar</button>
 
               &nbsp; &nbsp; 
               <span class="pull-right">
-                ¿Tienes una cuenta? <a href="{% url 'login' %}" class="text-primary">Login</a>
+                ¿Tienes una cuenta? <a href="{% url 'login' %}" class="text-primary">Iniciar Sesi&oacute;n</a>
               </span>
 
               <div class="clearfix"></div>

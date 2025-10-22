@@ -1,0 +1,134 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Editar Cliente {% endblock %}
+
+{% block stylesheets %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Estilos personalizados para Select2 -->
+<style>
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Editar Cliente</h4>
+                <p class="card-category">Modifique la información del cliente</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {{ form.non_field_errors }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Nombre Cliente <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="nombre_cliente" value="{{ form.nombre_cliente.value }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Email Cliente <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="email_cliente" value="{{ form.email_cliente.value }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Nombre Contacto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="nombre_contacto" value="{{ form.nombre_contacto.value }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Teléfono Contacto <span style="color: red;">(*)</span></label>
+                                <input type="number" class="form-control" name="telefono_contacto" value="{{ form.telefono_contacto.value }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Email Contacto <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="email_contacto" value="{{ form.email_contacto.value }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Dirección <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="direccion_cliente" value="{{ form.direccion_cliente.value }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Ciudad <span style="color: red;">(*)</span></label>
+                                <select class="form-control select2" name="ciudad_cliente">
+                                    {% for choice in form.ciudad_cliente.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if choice.0 == form.ciudad_cliente.value %}selected{% endif %}>
+                                        {{ choice.1 }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check" style="margin-top: 3rem;">
+                                <label class="form-check-label">
+                                    <input type="hidden" name="tiene_proyectos">
+                                    <input class="form-check-input" type="checkbox" name="tiene_proyectos" value="1" {% if form.tiene_proyectos.value %}checked{% endif %}>
+                                    <span class="form-check-sign">
+                                        <span class="check"></span>
+                                    </span>
+                                    <td>¿Tiene proyectos este cliente?</td>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary pull-right">Guardar Cambios</button>
+                    <a href="{% url 'lista_clientes' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Inicializar Select2 en el campo con la clase "select2"
+        $('.select2').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true
+        });
+    });
+</script>
+{% endblock javascripts %}

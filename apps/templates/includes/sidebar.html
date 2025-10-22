@@ -1,79 +1,128 @@
-    <div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
-      <div class="logo">
-        <a target="_blank" rel="noopener noreferrer" 
-           href="https://appseed.us/admin-dashboards/django-dashboard-material" class="simple-text logo-normal">
-          Django Material
+<div class="sidebar" data-color="purple" data-background-color="white" data-image="/static/assets/img/sidebar-1.jpg">
+  <div class="logo">
+    <h2 class="simple-text logo-normal">
+      <img src="/static/assets/img/apple-icon.png" width="64" height="64"> 
+    </h2>
+  </div>
+  <div class="sidebar-wrapper">
+    <ul class="nav">
+      {% if request.user.is_authenticated %}
+
+      {% if 'ver_dashboard' in permisos_usuario %}
+      <li class="nav-item {% if 'index' in segment %} active {% endif %}">
+        <a class="nav-link" href="/">
+          <i class="material-icons">dashboard</i>
+          <p>Dashboard</p>
         </a>
-      </div>
-      <div class="sidebar-wrapper">
-        <ul class="nav">
-        {% if request.user.is_authenticated %}
+      </li>
+      {% endif %}
+      
+      {% if 'ver_productos' in permisos_usuario %}
+      <li class="nav-item {% if 'productos' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_productos' %}">
+          <i class="material-icons">category</i>
+          <p>Productos</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_clientes' in permisos_usuario %}
+      <li class="nav-item {% if 'clientes' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_clientes' %}">
+          <i class="material-icons">group</i>
+          <p>Clientes</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_productos' in permisos_usuario %}
+      <li class="nav-item {% if 'proyectos' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_proyectos' %}">
+          <i class="material-icons">groups</i>
+          <p>Proyectos</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_pedidos' in permisos_usuario %}
+      <li class="nav-item {% if 'ordenes' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_ordenes_compra' %}">
+          <i class="material-icons">shopping_bag</i>
+          <p>Órdenes De Compra</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_productos' in permisos_usuario %}
+      <li class="nav-item {% if 'proveedores' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_proveedores' %}">
+          <i class="material-icons">local_shipping</i>
+          <p>Proveedores</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_despachos' in permisos_usuario %}
+      <li class="nav-item {% if 'despachos' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'buscar_orden' %}">
+          <i class="material-icons">library_books</i>
+          <p>Despachos</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_remisiones' in permisos_usuario %}
+      <li class="nav-item {% if 'remisiones' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_remisiones' %}">
+          <i class="material-icons">receipt</i>
+          <p>Remisiones</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_permisos' in permisos_usuario %}
+      <li class="nav-item {% if 'permisos' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_permisos' %}">
+          <i class="material-icons">security</i>
+          <p>Permisos</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_roles' in permisos_usuario %}
+      <li class="nav-item {% if 'roles' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_roles' %}">
+          <i class="material-icons">group</i>
+          <p>Roles</p>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if 'ver_usuarios' in permisos_usuario %}
+      <li class="nav-item {% if 'usuarios' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'lista_usuarios' %}">
+          <i class="material-icons">people</i>
+          <p>Usuarios</p>
+        </a>
+      </li>
+      {% endif %}
 
-          <li class="nav-item {% if 'index' in segment %} active {% endif %}">
-            <a class="nav-link" href="/">
-              <i class="material-icons">dashboard</i>
-              <p>Dashboard</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'page-user' in segment %} active {% endif %}">
-            <a class="nav-link" href="/page-user.html">
-              <i class="material-icons">person</i>
-              <p>User Profile</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'ui-tables' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-tables.html">
-              <i class="material-icons">content_paste</i>
-              <p>Table List</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'ui-typography' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-typography.html">
-              <i class="material-icons">library_books</i>
-              <p>Typography</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'ui-icons' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-icons.html">
-              <i class="material-icons">bubble_chart</i>
-              <p>Icons</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'ui-maps' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-maps.html">
-              <i class="material-icons">location_ons</i>
-              <p>Maps</p>
-            </a>
-          </li>
-          <li class="nav-item {% if 'ui-notifications' in segment %} active {% endif %}">
-            <a class="nav-link" href="/ui-notifications.html">
-              <i class="material-icons">notifications</i>
-              <p>Notifications</p>
-            </a>
-          </li>
-          
-          <li class="nav-item ">
-            <a class="nav-link" href="/page-rtl-support.html">
-              <i class="material-icons">language</i>
-              <p>RTL Support</p>
-            </a>
-          </li>
 
-          <li class="nav-item ">
-            <a class="nav-link" href="{% url 'logout' %}" >
-              <i class="material-icons">directions_run</i>
-              <p>Logout</p>
-            </a>
-          </li>
+      <li class="nav-item ">
+        <a class="nav-link" href="{% url 'logout' %}">
+          <i class="material-icons">directions_run</i>
+          <p>Cerrar Sesión</p>
+        </a>
+      </li>
 
-          
 
-        {% else %}
 
-                   
+      {% else %}
 
-        {% endif %}
-        </ul>
-      </div>
 
-    </div>
+
+      {% endif %}
+    </ul>
+  </div>
+
+</div>

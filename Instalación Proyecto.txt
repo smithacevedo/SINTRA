@@ -1,3 +1,4 @@
+
 # DOCUMENTACIÓN OFICIAL
 https://demos.creative-tim.com/argon-dashboard-django/docs/getting-started/getting-started-django.html?_ga=2.33541694.1858246354.1740671994-1663602739.1740245644
 
@@ -19,6 +20,7 @@ Vaya a la página de descarga oficial (https://git-scm.com/downloads)
 
 # Creamos el ambiente virtual:
 pip install virtualenv
+python -m virtualenv env
 virtualenv --no-site-packages env
 o virtualenv env
 
@@ -39,11 +41,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'sintra',
         'USER': 'postgres',
-        'PASSWORD': '123',
+        'PASSWORD': 'D3v3l0pm3nt',
         'HOST': 'localhost',
         'PORT': 5432
     },
 }
+
+pip install psycopg2==2.9.10
+
 
 # Luego correr migraciones:
 python manage.py makemigrations
@@ -62,14 +67,67 @@ python manage.py runserver
 
 
 ---------------------------------------------
-# Correr desde Docker:
-docker-compose --version
-docker-compose pull && docker-compose build && docker-compose up -d
-o docker-compose pull; docker-compose build; docker-compose up -d
-
-
 ----------------------------------------------
+---------------------------------------------
+# Sección de ejecución con contenedores eliminada: este repositorio ahora se documenta para ejecución local sin Docker.
+
 
 # Crear nuevas aplicaciones:
 python manage.py startapp compras
 
+
+# Correr las migraciones:
+python manage.py makemigrations
+python manage.py migrate
+
+-------------------------------------------------
+
+Para notificaciones personalizadas hay estos tipos de mensajes:
+
+messages.success(request, 'Mensaje de éxito')     # Notificación verde
+messages.error(request, 'Mensaje de error')       # Notificación roja
+messages.warning(request, 'Mensaje de advertencia') # Notificación amarilla
+messages.info(request, 'Mensaje informativo')     # Notificación azul
+
+
+-------------------------------------------------
+
+Si hay errores en migraciones, ejecutar:
+
+python clear_migrations.py
+
+Marcar las migraciones de cities_light como hechas (sin ejecutarlas):
+
+python manage.py migrate cities_light --fake
+
+Y ahí si ejecutar:
+python manage.py makemigrations
+python manage.py migrate
+
+
+En caso de otros errores de librerías:
+
+pip install --force-reinstall -r requirements.txt
+
+
+# En caso de no cargar información de cities_light en la bd correr:
+python manage.py cities_light --force-import-all --progress
+
+
+# Crear permisos y usuario admin
+
+# 2. Ejecutar scripts SQL
+\i limpiar_permisos.sql
+\i arreglar_secuencia.sql
+\i scripts_permisos.sql
+\q
+
+# 3. Crear usuario admin (OBLIGATORIO)
+python crear_admin.py
+
+
+=== USUARIO ADMINISTRADOR ===
+Usuario: admin
+Contraseña: admin123
+Email: admin@sintra.com
+Acceso: COMPLETO

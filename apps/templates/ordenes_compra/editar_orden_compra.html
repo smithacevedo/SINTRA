@@ -1,0 +1,368 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Editar Orden de Compra {% endblock %}
+
+{% block stylesheets %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    .select2-container .select2-selection--single {
+        height: auto !important;
+        padding: 0.5rem !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+    }
+    input[name$="-DELETE"] {
+        display: none !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<div class="row">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Editar Orden de Compra</h4>
+                <p class="card-category">Modifique la información de la orden</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {{ clientes_flags|json_script:"clientesFlags" }}
+                    {{ proyectos_by_cliente|json_script:"proyectosByCliente" }}
+                    {{ form.non_field_errors }}
+
+                    <!-- Cliente y Fecha -->
+                    <h5 class="mt-4 text-center text-uppercase">DATOS ORDEN</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating"># Orden Compra <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="codigo_oc" value="{{ form.codigo_oc.value|default_if_none:'' }}" required>
+                            </div>
+                            {% for error in form.codigo_oc.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fecha de Solicitud <span style="color: red;">(*)</span></label>
+                                {{ form.fecha_solicitud }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Cliente <span style="color: red;">(*)</span></label>
+                                {{ form.cliente }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Proyecto <span id="proyecto-required-star" style="color: red; display: none;">(*)</span></label>
+                                {{ form.proyecto }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos -->
+                    <h5 class="mt-4 text-center text-uppercase">Artículos registrados en orden de compra</h5>
+
+                    <div class="col-md-12">
+                        <small class="text-muted"><strong>Nota:</strong> Se debe registrar al menos un artículo.</small>
+                    </div>
+
+                    {{ formset.management_form }}
+                    <div class="card-body" id="formset-container">
+                        {% for f in formset %}
+                        <div class="producto-form row mb-3 border p-3 rounded bg-light">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Producto <span style="color: red;">(*)</span></label>
+                                    {{ f.producto }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cantidad <span style="color: red;">(*)</span></label>
+                                    {{ f.cantidad }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Descripción <span style="color: red;">(*)</span></label>
+                                    {{ f.descripcion }}
+                                </div>
+                            </div>
+                            {{ f.id }}
+                            {% if f.DELETE %}
+                                {{ f.DELETE }}
+                            {% endif %}
+                            {% if forloop.counter > 1 %}
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-form">Eliminar item</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Template oculto -->
+                    <template id="empty-form">
+                        <div class="producto-form row mb-3 border p-3 rounded bg-light">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Producto</label>
+                                    {{ formset.empty_form.producto }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cantidad</label>
+                                    {{ formset.empty_form.cantidad }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    {{ formset.empty_form.descripcion }}
+                                </div>
+                            </div>
+                            {{ formset.empty_form.id }}
+                            {{ formset.empty_form.DELETE }}
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-form">Eliminar item</button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Botones -->
+                    <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-form">
+                        + Añadir Producto
+                    </button>
+                    <button type="submit" class="btn btn-primary pull-right">Guardar Cambios</button>
+                    <a href="{% url 'lista_ordenes_compra' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
+                    <div class="clearfix"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    function initializeSelect2(container = document) {
+        $(container).find('select.select2').select2({
+            placeholder: "Seleccione una opción",
+            allowClear: true
+        });
+    }
+
+    let clientesFlags = {};
+    try {
+        const el = document.getElementById('clientesFlags');
+        if (el && el.textContent) clientesFlags = JSON.parse(el.textContent);
+    } catch (e) {
+        console.error('Error parseando clientesFlags en editar:', e);
+        clientesFlags = {};
+    }
+
+    function toggleProyectoCampo() {
+        const clienteSelect = document.querySelector('select[name="cliente"], input[name="cliente"]');
+        const proyectoField = document.querySelector('select[name="proyecto"], input[name="proyecto"]');
+        if (!clienteSelect || !proyectoField) return;
+
+        const star = document.getElementById('proyecto-required-star');
+
+        const clienteId = (window.jQuery && $(clienteSelect).hasClass('select2')) ? $(clienteSelect).val() : clienteSelect.value;
+
+        const tiene = clientesFlags && (clientesFlags[clienteId] === true || clientesFlags[clienteId] === 'True' || clientesFlags[clienteId] === 'true');
+
+        if (star) star.style.display = tiene ? 'inline' : 'none';
+
+        if (window.jQuery && $(proyectoField).hasClass('select2')) {
+            if (tiene) {
+                $(proyectoField).prop('disabled', false).prop('required', true).attr('required', 'required').trigger('change.select2');
+                $(proyectoField).closest('.select2-container').removeClass('disabled');
+            } else {
+                $(proyectoField).prop('disabled', true).prop('required', false).removeAttr('required').val(null).trigger('change');
+                $(proyectoField).closest('.select2-container').addClass('disabled');
+            }
+        } else {
+            if (tiene) {
+                proyectoField.disabled = false;
+                proyectoField.required = true;
+            } else {
+                proyectoField.disabled = true;
+                try { proyectoField.removeAttribute('required'); } catch (e) {}
+                if (proyectoField.tagName.toLowerCase() === 'select') proyectoField.value = '';
+                else proyectoField.value = '';
+            }
+        }
+
+        console.debug('editar toggleProyectoCampo:', { clienteId, tiene });
+    }
+
+    function poblarProyectosEditar(clienteId) {
+        let proyectos = {};
+        try {
+            const el = document.getElementById('proyectosByCliente');
+            if (el && el.textContent) proyectos = JSON.parse(el.textContent);
+        } catch (e) {
+            console.error('Error parseando proyectosByCliente en editar:', e);
+            proyectos = {};
+        }
+        const lista = proyectos[clienteId] || [];
+        const proyectoSelect = document.querySelector('select[name="proyecto"]');
+        if (!proyectoSelect) return;
+        const currentSelected = (window.jQuery && $(proyectoSelect).hasClass('select2')) ? $(proyectoSelect).val() : proyectoSelect.value;
+
+        while (proyectoSelect.firstChild) proyectoSelect.removeChild(proyectoSelect.firstChild);
+        const emptyOpt = document.createElement('option'); emptyOpt.value = ''; emptyOpt.textContent = ''; proyectoSelect.appendChild(emptyOpt);
+        lista.forEach(function (p) {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.nombre;
+            proyectoSelect.appendChild(opt);
+        });
+
+        const listaIds = lista.map(function (p) { return String(p.id); });
+        if (currentSelected && listaIds.indexOf(String(currentSelected)) !== -1) {
+            if (window.jQuery && $(proyectoSelect).hasClass('select2')) {
+                $(proyectoSelect).val(currentSelected).trigger('change');
+            } else {
+                proyectoSelect.value = currentSelected;
+            }
+        } else {
+            if (window.jQuery && $(proyectoSelect).hasClass('select2')) {
+                $(proyectoSelect).val(null).trigger('change');
+            } else {
+                proyectoSelect.value = '';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const totalForms = document.getElementById('id_productosolicitado_set-TOTAL_FORMS');
+        const formsetContainer = document.getElementById('formset-container');
+        const addFormBtn = document.getElementById('add-form');
+        const emptyFormTemplate = document.getElementById('empty-form');
+
+        const initialFormCount = parseInt(totalForms.value, 10);
+
+        initializeSelect2();
+
+        toggleProyectoCampo();
+        const initialClienteId = (window.jQuery && $('select[name="cliente"]').hasClass('select2')) ? $('select[name="cliente"]').val() : (document.querySelector('select[name="cliente"]') || {}).value;
+        if (initialClienteId) poblarProyectosEditar(initialClienteId);
+
+        const clienteSelect = document.querySelector('select[name="cliente"], input[name="cliente"]');
+        if (clienteSelect) clienteSelect.addEventListener('change', function () { toggleProyectoCampo(); poblarProyectosEditar(this.value); });
+
+        if (window.jQuery) {
+            try {
+                const $cliente = $('select[name="cliente"]');
+                if ($cliente.length) {
+                    $cliente.on('change', function () { const v = $(this).val(); console.log('editar jQuery change cliente:', v); toggleProyectoCampo(); poblarProyectosEditar(v); });
+                }
+            } catch (e) { console.warn('No se pudo enganchar jQuery change en editar:', e); }
+        }
+
+        function disableFormInputs(form) {
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if (!el.name) return;
+                if (/-DELETE$/.test(el.name) || /-id$/.test(el.name)) return;
+                if ($(el).hasClass('select2')) {
+                    try { $(el).select2('destroy'); } catch (e) { /* ignore */ }
+                }
+                el.disabled = true;
+                el.removeAttribute('required');
+            });
+        }
+
+        function reindexNewForms() {
+            const allForms = Array.from(formsetContainer.querySelectorAll('.producto-form'));
+            const newForms = [];
+
+            allForms.forEach(form => {
+                const firstNamed = form.querySelector('[name]');
+                if (!firstNamed) return;
+                const m = firstNamed.name.match(/-(\d+)-/);
+                if (!m) return;
+                const idx = parseInt(m[1], 10);
+                if (idx >= initialFormCount) newForms.push({ form, oldIndex: idx });
+            });
+
+            newForms.forEach((entry, i) => {
+                const newIndex = initialFormCount + i;
+                const form = entry.form;
+                form.querySelectorAll('[name]').forEach(el => {
+                    el.name = el.name.replace(/-(\d+)-/, `-${newIndex}-`);
+                });
+                form.querySelectorAll('[id]').forEach(el => {
+                    el.id = el.id.replace(/-(\d+)-/, `-${newIndex}-`);
+                });
+                form.querySelectorAll('label[for]').forEach(lb => {
+                    lb.htmlFor = lb.htmlFor.replace(/-(\d+)-/, `-${newIndex}-`);
+                });
+            });
+
+            totalForms.value = initialFormCount + newForms.length;
+        }
+
+        addFormBtn.addEventListener('click', function () {
+            const formCount = parseInt(totalForms.value, 10);
+            const newForm = emptyFormTemplate.content.cloneNode(true);
+
+            const elements = newForm.querySelectorAll('*');
+            elements.forEach((el) => {
+                for (let attr of el.attributes || []) {
+                    if (attr.value && attr.value.includes('__prefix__')) {
+                        el.setAttribute(attr.name, attr.value.replace(/__prefix__/g, formCount));
+                    }
+                }
+                if (el.innerHTML && el.innerHTML.includes('__prefix__')) {
+                    el.innerHTML = el.innerHTML.replace(/__prefix__/g, formCount);
+                }
+            });
+
+            formsetContainer.appendChild(newForm);
+            initializeSelect2(formsetContainer);
+            totalForms.value = formCount + 1;
+        });
+
+        formsetContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-form')) {
+                const form = e.target.closest('.producto-form');
+                const deleteInput = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
+
+                if (deleteInput) {
+                    deleteInput.checked = true;
+                    disableFormInputs(form);
+                    form.style.display = 'none';
+                } else {
+                    form.remove();
+                    reindexNewForms();
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock javascripts %}
