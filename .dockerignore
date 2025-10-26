@@ -10,3 +10,15 @@ node_modules
 .DS_Store
 # Docker build artifacts
 *.deb
+
+
+**/__pycache__/
+**/*.pyc
+.env
+.venv/
+venv/
+env/
+node_modules/
+dist/
+build/
+**/site-packages/

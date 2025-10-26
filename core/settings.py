@@ -178,3 +178,5 @@ STATICFILES_DIRS = (
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['es']  # Idioma de las ciudades
 CITIES_LIGHT_INCLUDE_COUNTRIES = ['CO']  # Solo cargar ciudades de Colombia
 #############################################################
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
