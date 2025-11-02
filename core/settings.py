@@ -19,7 +19,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'sintra.vanisa.cloud', '195.35.9.243', config('SERVER', default='127.0.0.1')]
 
 # Todos los proyecto usen BigAutoField por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -93,12 +93,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sintra',
-        'USER': 'postgres',
-       'PASSWORD': 'D3v3l0pm3nt',
-       # 'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT': 5432
+        'NAME': config('DB_NAME', default='sintra'),
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default='postgres'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432')
     },
 }
 
@@ -179,3 +178,5 @@ STATICFILES_DIRS = (
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['es']  # Idioma de las ciudades
 CITIES_LIGHT_INCLUDE_COUNTRIES = ['CO']  # Solo cargar ciudades de Colombia
 #############################################################
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

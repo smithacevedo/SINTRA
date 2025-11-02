@@ -1,3 +1,8 @@
 DEBUG=True
 SECRET_KEY=S3cr3t_K#Key
 SERVER=boilerplate-code-django-dashboard.appseed.us
+DB_NAME=sintra
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
