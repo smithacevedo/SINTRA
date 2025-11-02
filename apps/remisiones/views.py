@@ -1,3 +1,4 @@
+import platform
 import shutil
 from django.shortcuts import render, get_object_or_404
 from .models import Remision, DetalleRemision
@@ -310,16 +311,10 @@ def descargar_remision_pdf(request, remision_id):
         soffice_path = os.environ.get('SOFFICE_PATH')
         if not soffice_path:
             soffice_path = shutil.which('soffice')
-        if not soffice_path:
-            # Rutas comunes en Linux
-            posibles = [
-                '/usr/bin/soffice',
-                '/usr/lib/libreoffice/program/soffice'
-            ]
-            for p in posibles:
-                if os.path.exists(p):
-                    soffice_path = p
-                    break
+
+        if platform.system() == 'Linux' and os.path.exists('/usr/bin/soffice'):
+            soffice_path = '/usr/bin/soffice'
+
         if not soffice_path:
             raise FileNotFoundError("No se encontró LibreOffice (soffice). Ajusta la variable SOFFICE_PATH o instala LibreOffice.")
 
