@@ -66,6 +66,10 @@
                                     <a href="{% url 'descargar_remision_excel' remision.id %}" class="btn btn-sm btn-success" style="margin-left:6px;">
                                         <i class="material-icons">file_download</i> Descargar Excel
                                     </a>
+                                    <!-- Botón de Descargar PDF eliminado del proyecto -->
+                                    <a href="{% url 'descargar_remision_pdf' remision.id %}" class="btn btn-sm btn-danger" style="margin-left:6px;">
+                                        <i class="material-icons">picture_as_pdf</i> Descargar PDF
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
