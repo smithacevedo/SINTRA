@@ -1,3 +1,4 @@
+import shutil
 from django.shortcuts import render, get_object_or_404
 from .models import Remision, DetalleRemision
 from apps.utils.permisos import requiere_permiso
@@ -305,8 +306,22 @@ def descargar_remision_pdf(request, remision_id):
         pdf_path = os.path.join(tmpdir, f'remision_{remision.numero_remision}.pdf')
         wb.save(excel_path)
 
-        # Ruta a soffice.exe (ajusta según tu instalación)
-        soffice_path = os.environ.get('SOFFICE_PATH', 'soffice')
+        # Buscar ruta de soffice según sistema operativo
+        soffice_path = os.environ.get('SOFFICE_PATH')
+        if not soffice_path:
+            soffice_path = shutil.which('soffice')
+        if not soffice_path:
+            # Rutas comunes en Linux
+            posibles = [
+                '/usr/bin/soffice',
+                '/usr/lib/libreoffice/program/soffice'
+            ]
+            for p in posibles:
+                if os.path.exists(p):
+                    soffice_path = p
+                    break
+        if not soffice_path:
+            raise FileNotFoundError("No se encontró LibreOffice (soffice). Ajusta la variable SOFFICE_PATH o instala LibreOffice.")
 
         # Convertir a PDF
         subprocess.run([
