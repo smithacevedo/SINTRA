@@ -174,7 +174,7 @@ def descargar_remision_pdf(request, remision_id):
     remision = get_object_or_404(Remision, id=remision_id)
     detalles = remision.detalles.filter(despacho__reintegro=False)
     core_dir = getattr(settings, 'CORE_DIR', '')
-    plantilla = os.path.join(core_dir, 'apps', 'templates', 'excel', 'remisiones.xlsx')
+    plantilla = os.path.join(core_dir, 'apps', 'templates', 'EXCEL', 'remisiones.xlsx')
 
     if os.path.exists(plantilla):
         wb = openpyxl.load_workbook(plantilla)
@@ -205,7 +205,7 @@ def descargar_remision_pdf(request, remision_id):
     hoy = datetime.date.today()
     _write_cell(ws, 4, 7, f"{hoy.day}/{hoy.month}/{hoy.year}")
 
-    img_file = os.path.join(core_dir, 'apps', 'templates', 'img', 'REMISIONES.png')
+    img_file = os.path.join(core_dir, 'apps', 'templates', 'IMG', 'REMISIONES.png')
     if os.path.exists(img_file):
         img = XLImage(img_file)
         orig_w, orig_h = getattr(img, 'width', None), getattr(img, 'height', None)
