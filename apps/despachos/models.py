@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from apps.ordenes_compra.models import ProductoSolicitado
 
 
@@ -12,6 +13,14 @@ class Despacho(models.Model):
     cantidad = models.PositiveIntegerField()
     reintegro = models.BooleanField(default=False)
     fecha_reintegro = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="despachos_creados",
+        verbose_name="Creado por"
+    )
 
     def save(self, *args, **kwargs):
         # Solo validar cantidad si es un nuevo despacho (no reintegro)

@@ -46,6 +46,9 @@ def descargar_remision_excel(request, remision_id):
 
     remision = get_object_or_404(Remision, id=remision_id)
     detalles = remision.detalles.filter(despacho__reintegro=False)
+
+    nombre_receptor = request.GET.get('nombre_receptor', '')
+
     core_dir = getattr(settings, 'CORE_DIR', '')
     plantilla = os.path.join(core_dir, 'apps', 'templates', 'EXCEL', 'remisiones.xlsx')
 
@@ -87,9 +90,10 @@ def descargar_remision_excel(request, remision_id):
             img.width = target_w
             img.height = int(target_w * orig_h / orig_w)
             ws.column_dimensions['A'].width = 18
-            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['B'].width = 32
             ws.column_dimensions['C'].width = 30
             ws.column_dimensions['D'].width = 18
+            ws.column_dimensions['E'].width = 32
             h_pts = img.height * 0.75
             ws.row_dimensions[1].height = int(h_pts * 0.7)
             ws.row_dimensions[2].height = int(h_pts * 0.3)
@@ -161,6 +165,16 @@ def descargar_remision_excel(request, remision_id):
         _write_cell(ws, r, 7, getattr(prod_solic, 'pendiente', ''))
         r += 1
 
+    if detalles.exists():
+        primer_despacho = detalles.first().despacho
+        usuario_creador = getattr(primer_despacho, 'created_by', None)
+        if usuario_creador:
+            nombre_completo = f"{usuario_creador.first_name} {usuario_creador.last_name}"
+            _write_cell(ws, 54, 2, nombre_completo)
+
+    if nombre_receptor:
+        _write_cell(ws, 54, 5, nombre_receptor)
+
     out = io.BytesIO(); wb.save(out); out.seek(0)
     fn = f"remision_{remision.numero_remision}.xlsx"
     resp = HttpResponse(out.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -173,6 +187,9 @@ def descargar_remision_excel(request, remision_id):
 def descargar_remision_pdf(request, remision_id):
     remision = get_object_or_404(Remision, id=remision_id)
     detalles = remision.detalles.filter(despacho__reintegro=False)
+
+    nombre_receptor = request.GET.get('nombre_receptor', '')
+
     core_dir = getattr(settings, 'CORE_DIR', '')
     plantilla = os.path.join(core_dir, 'apps', 'templates', 'EXCEL', 'remisiones.xlsx')
 
@@ -214,9 +231,10 @@ def descargar_remision_pdf(request, remision_id):
             img.width = target_w
             img.height = int(target_w * orig_h / orig_w)
             ws.column_dimensions['A'].width = 18
-            ws.column_dimensions['B'].width = 30
+            ws.column_dimensions['B'].width = 32
             ws.column_dimensions['C'].width = 30
             ws.column_dimensions['D'].width = 18
+            ws.column_dimensions['E'].width = 32
             h_pts = img.height * 0.75
             ws.row_dimensions[1].height = int(h_pts * 0.7)
             ws.row_dimensions[2].height = int(h_pts * 0.3)
@@ -300,6 +318,20 @@ def descargar_remision_pdf(request, remision_id):
         ws.page_margins = PageMargins(left=0.25, right=0.25, top=0.5, bottom=0.5,
                                     header=0.3, footer=0.3)
         ws.print_options.horizontalCentered = True
+
+
+    if detalles.exists():
+        primer_despacho = detalles.first().despacho
+        usuario_creador = getattr(primer_despacho, 'created_by', None)
+        if usuario_creador:
+            nombre_completo = f"{usuario_creador.first_name} {usuario_creador.last_name}".strip()
+            if not nombre_completo:
+                nombre_completo = usuario_creador.username
+            _write_cell(ws, 54, 2, nombre_completo)
+
+
+    if nombre_receptor:
+        _write_cell(ws, 54, 5, nombre_receptor)
 
     # Guardar Excel temporalmente y convertir a PDF con LibreOffice
     with tempfile.TemporaryDirectory() as tmpdir:

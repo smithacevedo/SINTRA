@@ -62,14 +62,16 @@
                                     <a href="{% url 'detalle_remision' remision.id %}" class="btn btn-sm btn-primary">
                                         <i class="material-icons">visibility</i> Ver Detalle
                                     </a>
-                                    <!-- Botón de Descargar PDF eliminado del proyecto -->
-                                    <a href="{% url 'descargar_remision_excel' remision.id %}" class="btn btn-sm btn-success" style="margin-left:6px;">
+                                    <!-- Botón de descargar EXCEL -->
+                                    <button type="button" class="btn btn-sm btn-success" style="margin-left:6px;" 
+                                            onclick="abrirModalDescarga('{{ remision.id }}', 'excel')">
                                         <i class="material-icons">file_download</i> Descargar Excel
-                                    </a>
-                                    <!-- Botón de Descargar PDF eliminado del proyecto -->
-                                    <a href="{% url 'descargar_remision_pdf' remision.id %}" class="btn btn-sm btn-danger" style="margin-left:6px;">
+                                    </button>
+                                    <!-- Botón de descargar PDF -->
+                                    <button type="button" class="btn btn-sm btn-danger" style="margin-left:6px;" 
+                                            onclick="abrirModalDescarga('{{ remision.id }}', 'pdf')">
                                         <i class="material-icons">picture_as_pdf</i> Descargar PDF
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -90,4 +92,43 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para ingresar nombre de quien recibe -->
+<div class="modal fade" id="modalReceptor" tabindex="-1" role="dialog" aria-labelledby="modalReceptorLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalReceptorLabel">Información de Recepción</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formDescarga" method="GET">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="bmd-label-floating">Ingrese el nombre de la persona que recibirá los productos</label>
+                        <input type="text" class="form-control" id="nombreReceptor" name="nombre_receptor" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Descargar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModalDescarga(remisionId, tipo) {
+    const form = document.getElementById('formDescarga');
+    const baseUrl = tipo === 'excel' 
+        ? "{% url 'descargar_remision_excel' 0 %}".replace('0', remisionId)
+        : "{% url 'descargar_remision_pdf' 0 %}".replace('0', remisionId);
+    
+    form.action = baseUrl;
+    document.getElementById('nombreReceptor').value = '';
+    $('#modalReceptor').modal('show');
+}
+</script>
 {% endblock %}

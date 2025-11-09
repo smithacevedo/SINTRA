@@ -44,7 +44,8 @@ def despacho_unificado(request, codigo_oc):
                     else:
                         despacho = Despacho.objects.create(
                             producto_solicitado=producto,
-                            cantidad=cantidad
+                            cantidad=cantidad,
+                            created_by=request.user
                         )
                         despachos_creados.append(despacho)
                         despachos_realizados += 1
