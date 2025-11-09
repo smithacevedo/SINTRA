@@ -165,6 +165,21 @@ def descargar_remision_excel(request, remision_id):
         _write_cell(ws, r, 7, getattr(prod_solic, 'pendiente', ''))
         r += 1
 
+    if remision.orden:
+        productos_pendientes = []
+        for prod_solic in remision.orden.productos.all():
+            if prod_solic.pendiente > 0:
+                ref = getattr(getattr(prod_solic, 'producto', None), 'referencia', 'N/A')
+                desc = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
+                productos_pendientes.append(f"REF: {ref} | DESC: {desc} | PENDIENTE: {prod_solic.pendiente}")
+
+        if productos_pendientes:
+            resumen = "PENDIENTE POR DESPACHAR:\n" + "\n".join(productos_pendientes)
+        else:
+            resumen = "ORDEN DE COMPRA COMPLETAMENTE DESPACHADA"
+
+        _write_cell(ws, 38, 1, resumen)
+
     if detalles.exists():
         primer_despacho = detalles.first().despacho
         usuario_creador = getattr(primer_despacho, 'created_by', None)
@@ -319,6 +334,20 @@ def descargar_remision_pdf(request, remision_id):
                                     header=0.3, footer=0.3)
         ws.print_options.horizontalCentered = True
 
+    if remision.orden:
+        productos_pendientes = []
+        for prod_solic in remision.orden.productos.all():
+            if prod_solic.pendiente > 0:
+                ref = getattr(getattr(prod_solic, 'producto', None), 'referencia', 'N/A')
+                desc = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
+                productos_pendientes.append(f"REF: {ref} | DESC: {desc} | PENDIENTE: {prod_solic.pendiente}")
+
+        if productos_pendientes:
+            resumen = "PENDIENTE POR DESPACHAR:\n" + "\n".join(productos_pendientes)
+        else:
+            resumen = "ORDEN DE COMPRA COMPLETAMENTE DESPACHADA"
+
+        _write_cell(ws, 38, 1, resumen)
 
     if detalles.exists():
         primer_despacho = detalles.first().despacho
