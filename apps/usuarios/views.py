@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from apps.roles.models import Rol
 from apps.permisos.models import Permiso
 from .models import UsuarioRol, PerfilUsuario
@@ -21,8 +22,14 @@ def lista_usuarios(request):
                        tiene_permiso(request.user, 'editar_usuarios') or 
                        tiene_permiso(request.user, 'eliminar_usuarios'))
     usuarios = User.objects.all().order_by('username')
+    
+    paginator = Paginator(usuarios, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, 'usuarios/lista_usuarios.html', {
-        'usuarios': usuarios,
+        'usuarios': page_obj,
+        'page_obj': page_obj,
         'solo_lectura': solo_lectura
     })
 

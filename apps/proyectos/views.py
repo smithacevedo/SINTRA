@@ -14,6 +14,7 @@ class ListaProyectosView(ListView):
     model = Proyectos
     template_name = 'proyectos/lista_proyectos.html'
     context_object_name = 'proyectos'
+    paginate_by = 15
     
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

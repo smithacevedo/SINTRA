@@ -11,6 +11,11 @@ from django.utils.decorators import method_decorator
 
 
 class ListaProductosView(ListView):
+    model = Producto
+    template_name = 'productos/lista_productos.html'
+    context_object_name = 'productos'
+    paginate_by = 15
+    
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -18,9 +23,6 @@ class ListaProductosView(ListView):
             messages.error(request, 'No tienes permisos para acceder a esta página.')
             return redirect('home')
         return super().dispatch(request, *args, **kwargs)
-    model = Producto
-    template_name = 'productos/lista_productos.html'
-    context_object_name = 'productos'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
