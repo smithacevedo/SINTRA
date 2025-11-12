@@ -5,6 +5,7 @@ from .models import Remision, DetalleRemision
 from apps.utils.permisos import requiere_permiso
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.core.paginator import Paginator
 import os
 from django.conf import settings
 import io
@@ -25,8 +26,13 @@ def lista_remisiones(request):
     else:
         remisiones = Remision.objects.all().order_by('-fecha_remision')
     
+    paginator = Paginator(remisiones, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, 'remisiones/lista_remisiones.html', {
-        'remisiones': remisiones,
+        'remisiones': page_obj,
+        'page_obj': page_obj,
         'buscar': buscar
     })
 

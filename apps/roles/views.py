@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import Rol
 from .forms import RolForm
 from apps.utils.permisos import requiere_permiso, tiene_permiso
@@ -16,8 +17,14 @@ def lista_roles(request):
                        tiene_permiso(request.user, 'editar_roles') or 
                        tiene_permiso(request.user, 'eliminar_roles'))
     roles = Rol.objects.all().order_by('nombre')
+    
+    paginator = Paginator(roles, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, 'roles/lista_roles.html', {
-        'roles': roles,
+        'roles': page_obj,
+        'page_obj': page_obj,
         'solo_lectura': solo_lectura
     })
 

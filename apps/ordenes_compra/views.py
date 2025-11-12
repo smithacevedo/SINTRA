@@ -17,6 +17,7 @@ class ListaOrdenesCompraView(ListView):
     model = OrdenCompra
     template_name = 'ordenes_compra/lista_ordenes_compra.html'
     context_object_name = 'ordenes'
+    paginate_by = 15
     
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
