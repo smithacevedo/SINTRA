@@ -1,0 +1,187 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} {{ nombre_cargue }} {% endblock %}
+
+{% block stylesheets %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+    .archivo-ejemplo {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .drop-zone {
+        border: 2px dashed #9c27b0;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #fafafa;
+    }
+
+    .drop-zone:hover {
+        background-color: #f0f0f0;
+        border-color: #7b1fa2;
+    }
+
+    .drop-zone.dragover {
+        background-color: #e1bee7;
+        border-color: #6a1b9a;
+    }
+
+    .file-info {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #e8f5e9;
+        border-radius: 5px;
+        display: none;
+    }
+
+    .file-info.show {
+        display: block;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">{{ nombre_cargue }}</h4>
+                <p class="card-category">Carga masiva de datos desde archivo Excel o CSV</p>
+            </div>
+            <div class="card-body">
+                <!-- Sección de archivo ejemplo -->
+                <div class="archivo-ejemplo">
+                    <h5><i class="material-icons" style="vertical-align: middle;">download</i> Archivo Ejemplo</h5>
+                    <p class="mb-2">Descarga el archivo ejemplo para ver el formato requerido:</p>
+                    <a href="/static/cargues_masivos/{{ archivo_ejemplo }}" class="btn btn-info btn-sm" download>
+                        <i class="material-icons">file_download</i> Descargar {{ archivo_ejemplo }}
+                    </a>
+                    <p class="mt-2 mb-0 text-muted small">
+                        <i class="material-icons" style="font-size: 16px; vertical-align: middle;">info</i>
+                        El archivo debe tener las mismas columnas que el ejemplo
+                    </p>
+                </div>
+
+                <!-- Formulario de carga -->
+                <form method="post" enctype="multipart/form-data" id="form-cargue">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="archivo-cargue">
+                            <h5><i class="material-icons" style="vertical-align: middle;">upload_file</i> Cargar Archivo
+                            </h5>
+                        </label>
+
+                        <div class="drop-zone" id="drop-zone">
+                            <i class="material-icons" style="font-size: 48px; color: #9c27b0;">cloud_upload</i>
+                            <p class="mt-2 mb-2">Arrastra y suelta tu archivo aquí</p>
+                            <p class="text-muted">o</p>
+                            {{ form.archivo }}
+                            <label for="archivo-cargue" class="btn btn-outline-primary btn-sm mt-2">
+                                Seleccionar Archivo
+                            </label>
+                        </div>
+
+                        <div class="file-info" id="file-info">
+                            <i class="material-icons" style="vertical-align: middle; color: #4caf50;">check_circle</i>
+                            <strong>Archivo seleccionado:</strong>
+                            <span id="file-name"></span>
+                            <span class="text-muted">(<span id="file-size"></span>)</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'cargues_masivos:lista_cargues' %}" class="btn btn-secondary">
+                            <i class="material-icons">arrow_back</i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="btn-cargar" disabled>
+                            <i class="material-icons">upload</i> Cargar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('archivo-cargue');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('file-name');
+    const fileSize = document.getElementById('file-size');
+    const btnCargar = document.getElementById('btn-cargar');
+
+    // Prevenir comportamiento por defecto del navegador
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('dragover');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('dragover');
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+
+    function handleFileSelect(file) {
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.add('show');
+        btnCargar.disabled = false;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+</script>
+{% endblock javascripts %}

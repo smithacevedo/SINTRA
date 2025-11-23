@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'apps.roles',
     'apps.usuarios',
     'apps.proyectos',
-    #'apps.detalles_orden',
+    'apps.cargues_masivos',
 ]
 
 MIDDLEWARE = [
