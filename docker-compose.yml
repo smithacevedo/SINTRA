@@ -1,66 +1,48 @@
 services:
-  db:
+  db_test:
     image: postgres:16
     environment:
-      POSTGRES_DB: ${DB_NAME:-sintra}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: sintra_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 10s
-      timeout: 1s
-      retries: 10
+      - pgdata_test:/var/lib/postgresql/data
 
-  web:
+  web_test:
     build: .
-    depends_on:
-      db:
-        condition: service_healthy
-    env_file:
-      - .env
+    env_file: .env
     environment:
-      DB_HOST: db
+      DB_HOST: db_test
       DB_PORT: "5432"
-      DJANGO_WSGI_MODULE: ${DJANGO_WSGI_MODULE:-core.wsgi}
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-core.settings}
-      DJANGO_COLLECTSTATIC: "1"
-    volumes:
-      - .:/app
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      DJANGO_WSGI_MODULE: core.wsgi
+      DJANGO_SETTINGS_MODULE: core.settings
+    depends_on:
+      - db_test
     expose:
       - "8000"
+    volumes:
+      - .:/app
+      - static_volume_test:/app/staticfiles
+      - media_volume_test:/app/media
 
-  nginx:
+  nginx_test:
     image: nginx:alpine
     depends_on:
-      - web
+      - web_test
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
     volumes:
       - ./nginx/sintra.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-      - static_volume:/var/www/static
-      - media_volume:/var/www/media
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
-    entrypoint: "/bin/sh -c"
-    command: >
-      "trap exit TERM;
-       while :; do
-         certbot renew --webroot -w /var/www/certbot --quiet --deploy-hook 'nginx -s reload';
-         sleep 12h;
-       done"
+      - static_volume_test:/var/www/static
+      - media_volume_test:/var/www/media
 
 volumes:
-  pgdata:
-  static_volume:
-  media_volume:
+  pgdata_test:
+    external: true
+    name: sintra_test_pgdata_test           # <<< el que tiene tus datos
+  static_volume_test:
+    external: true
+    name: sintra_test_static_volume_test    # <<< el que tiene tus estáticos
+  media_volume_test:
+    external: true
+    name: sintra_test_media_volume_test     # <<< el que tiene tus medias
