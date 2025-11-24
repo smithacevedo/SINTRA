@@ -75,7 +75,7 @@
                     </a>
                     <p class="mt-2 mb-0 text-muted small">
                         <i class="material-icons" style="font-size: 16px; vertical-align: middle;">info</i>
-                        El archivo debe tener las mismas columnas que el ejemplo
+                        El archivo debe tener las mismas columnas que el ejemplo.
                     </p>
                 </div>
 
@@ -132,7 +132,6 @@
     const fileSize = document.getElementById('file-size');
     const btnCargar = document.getElementById('btn-cargar');
 
-    // Prevenir comportamiento por defecto del navegador
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
         document.body.addEventListener(eventName, preventDefaults, false);
