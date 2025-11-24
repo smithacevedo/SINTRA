@@ -8,6 +8,7 @@ def procesar_cargue_productos(archivo):
     """
     Procesa el archivo Excel de productos y crea registros nuevos.
     Si encuentra un producto existente o hay errores, cancela todo el cargue.
+    Autor: Jeison Acevedo
     """
 
     resultados = {
