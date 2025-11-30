@@ -1,7 +1,9 @@
 from openpyxl import load_workbook
+from apps.clientes.models import Clientes
 from apps.productos.models import Producto
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
+from cities_light.models import City
 
 
 def procesar_cargue_productos(archivo):
@@ -118,4 +120,86 @@ def procesar_cargue_productos(archivo):
         resultados['errores'].append(f"Error al leer el archivo: {str(e)}")
         resultados['fallidos'] += 1
 
+    return resultados
+
+def procesar_cargue_clientes(archivo):
+    """
+    Procesa el archivo Excel de clientes y crea registros nuevos.
+    Si encuentra un cliente existente o hay errores, cancela todo el cargue.
+    Autor: Jeison Acevedo
+    """
+
+    wb = load_workbook(archivo)
+    ws = wb.active
+    resultados = {
+        'exitosos': 0,
+        'fallidos': 0,
+        'errores': []
+    }
+    clientes_a_crear = []
+    try:
+        for fila_num, fila in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            try:
+                if not any(fila):
+                    continue
+                nombre_cliente = str(fila[0]).strip() if fila[0] else None
+                email_cliente = str(fila[1]).strip() if fila[1] else None
+                nombre_contacto = str(fila[2]).strip() if fila[2] else None
+                telefono_contacto = str(fila[3]).strip() if fila[3] else None
+                email_contacto = str(fila[4]).strip() if fila[4] else None
+                direccion = str(fila[5]).strip() if fila[5] else None
+                ciudad_name = str(fila[6]).strip() if fila[6] else None
+                tiene_proyectos = str(fila[7]).strip().upper() if fila[7] else None
+
+                if not nombre_cliente:
+                    resultados['errores'].append(f"Fila {fila_num}: Nombre de cliente vacío")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+                if Clientes.objects.filter(nombre_cliente=nombre_cliente).exists():
+                    resultados['errores'].append(f"Fila {fila_num}: El cliente '{nombre_cliente}' ya existe")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+                ciudad_obj = City.objects.filter(name=ciudad_name).first() if ciudad_name else None
+                if not ciudad_obj:
+                    resultados['errores'].append(f"Fila {fila_num}: Ciudad '{ciudad_name}' no encontrada")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+                if tiene_proyectos not in ['SI', 'NO']:
+                    resultados['errores'].append(f"Fila {fila_num}: Valor de proyectos inválido '{tiene_proyectos}' (debe ser SI o NO)")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+                tiene_proyectos_bool = True if tiene_proyectos == 'SI' else False
+
+                clientes_a_crear.append(Clientes(
+                    nombre_cliente=nombre_cliente,
+                    email_cliente=email_cliente,
+                    nombre_contacto=nombre_contacto,
+                    telefono_contacto=telefono_contacto,
+                    email_contacto=email_contacto,
+                    direccion_cliente=direccion,
+                    ciudad_cliente=ciudad_obj,
+                    tiene_proyectos=tiene_proyectos_bool
+                ))
+            except Exception as e:
+                resultados['errores'].append(f"Fila {fila_num}: Error procesando - {str(e)}")
+                resultados['fallidos'] += 1
+                wb.close()
+                return resultados
+        wb.close()
+        if clientes_a_crear:
+            try:
+                with transaction.atomic():
+                    Clientes.objects.bulk_create(clientes_a_crear)
+                    resultados['exitosos'] = len(clientes_a_crear)
+            except Exception as e:
+                resultados['errores'].append(f"Error al guardar clientes en la base de datos: {str(e)}")
+                resultados['fallidos'] = len(clientes_a_crear)
+                return resultados
+    except Exception as e:
+        resultados['errores'].append(f"Error al leer el archivo: {str(e)}")
+        resultados['fallidos'] += 1
     return resultados
