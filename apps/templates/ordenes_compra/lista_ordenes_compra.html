@@ -37,6 +37,7 @@
                                 <th>Cliente</th>
                                 <th>Proyecto</th>
                                 <th>Fecha de Solicitud</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -53,7 +54,15 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ orden.fecha_solicitud }}</td>
+                                <td>
+                                    <span class="badge badge-{% if orden.actualizar_estado == 'finalizada' %}success{% elif orden.actualizar_estado == 'parcial' %}warning{% else %}secondary{% endif %}">
+                                        {{ orden.get_estado_orden_display|default:orden.actualizar_estado|capfirst }}
+                                    </span>
+                                </td>
                                 <td class="td-actions text-left">
+                                    <a href="{% url 'remisiones_orden' orden.id %}" class="btn btn-info btn-link btn-sm" title="Ver Remisiones">
+                                        <i class="material-icons">receipt</i>
+                                    </a>
                                     {% if 'editar_pedidos' in permisos_usuario and not solo_lectura %}
                                     <a href="{% url 'editar_orden_compra' orden.id %}" class="btn btn-primary btn-link btn-sm">
                                         <i class="material-icons">edit</i>
@@ -92,7 +101,7 @@
                             </div>
                             {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No hay órdenes de compra registradas.</td>
+                                <td colspan="6" class="text-center">No hay órdenes de compra registradas.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
