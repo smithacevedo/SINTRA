@@ -4,6 +4,7 @@ from apps.productos.models import Producto
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from cities_light.models import City
+from apps.proyectos.models import Proyectos
 
 
 def procesar_cargue_productos(archivo):
@@ -198,6 +199,94 @@ def procesar_cargue_clientes(archivo):
             except Exception as e:
                 resultados['errores'].append(f"Error al guardar clientes en la base de datos: {str(e)}")
                 resultados['fallidos'] = len(clientes_a_crear)
+                return resultados
+    except Exception as e:
+        resultados['errores'].append(f"Error al leer el archivo: {str(e)}")
+        resultados['fallidos'] += 1
+    return resultados
+
+def procesar_cargue_proyectos(archivo):
+    """
+    Procesa el archivo Excel de proyectos y crea registros nuevos.
+    Si encuentra un proyecto existente o hay errores, cancela todo el cargue.
+    Autor: Jeison Acevedo
+    """
+
+    wb = load_workbook(archivo)
+    ws = wb.active
+    resultados = {
+        'exitosos': 0,
+        'fallidos': 0,
+        'errores': []
+    }
+    proyectos_a_crear = []
+    try:
+        for fila_num, fila in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            try:
+                if not any(fila):
+                    continue
+                nombre_cliente = str(fila[0]).strip().lower() if fila[0] else None
+                ciudad_name = str(fila[1]).strip().lower() if fila[1] else None
+                nombre_proyecto = str(fila[2]).strip() if fila[2] else None
+                email_proyecto = str(fila[3]).strip() if fila[3] else None
+                nombre_contacto = str(fila[4]).strip() if fila[4] else None
+                telefono_contacto = str(fila[5]).strip() if fila[5] else None
+                email_contacto = str(fila[6]).strip() if fila[6] else None
+                direccion = str(fila[7]).strip() if fila[7] else None
+
+                campos = [nombre_cliente, ciudad_name, nombre_proyecto, email_proyecto, nombre_contacto, telefono_contacto, email_contacto, direccion]
+                if not all(campos):
+                    resultados['errores'].append(f"Fila {fila_num}: Algún campo está vacío")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                cliente_obj = None
+                for c in Clientes.objects.filter(tiene_proyectos=True):
+                    if c.nombre_cliente and c.nombre_cliente.strip().lower() == nombre_cliente:
+                        cliente_obj = c
+                        break
+                if not cliente_obj:
+                    resultados['errores'].append(f"Fila {fila_num}: Cliente '{nombre_cliente}' no existe o no tiene proyectos habilitados")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                ciudad_obj = None
+                for city in City.objects.all():
+                    if city.name and city.name.strip().lower() == ciudad_name:
+                        ciudad_obj = city
+                        break
+                if not ciudad_obj:
+                    resultados['errores'].append(f"Fila {fila_num}: Ciudad '{ciudad_name}' no encontrada")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                proyectos_a_crear.append(Proyectos(
+                    cliente=cliente_obj,
+                    ciudad_proyecto=ciudad_obj,
+                    nombre_proyecto=nombre_proyecto,
+                    email_proyecto=email_proyecto,
+                    nombre_contacto=nombre_contacto,
+                    telefono_contacto=telefono_contacto,
+                    email_contacto=email_contacto,
+                    direccion_proyecto=direccion
+                ))
+            except Exception as e:
+                resultados['errores'].append(f"Fila {fila_num}: Error procesando - {str(e)}")
+                resultados['fallidos'] += 1
+                wb.close()
+                return resultados
+        wb.close()
+        if proyectos_a_crear:
+            try:
+                with transaction.atomic():
+                    Proyectos.objects.bulk_create(proyectos_a_crear)
+                    resultados['exitosos'] = len(proyectos_a_crear)
+            except Exception as e:
+                resultados['errores'].append(f"Error al guardar proyectos en la base de datos: {str(e)}")
+                resultados['fallidos'] = len(proyectos_a_crear)
                 return resultados
     except Exception as e:
         resultados['errores'].append(f"Error al leer el archivo: {str(e)}")
