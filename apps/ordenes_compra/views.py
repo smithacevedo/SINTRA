@@ -136,3 +136,15 @@ class EliminarOrdenCompraView(LoginRequiredMixin, View):
         orden.delete()
         messages.success(request, f'La orden de compra del cliente "{orden.cliente.nombre_cliente}" ha sido eliminada.')
         return redirect('lista_ordenes_compra')
+
+
+@requiere_permiso('ver_pedidos')
+def remisiones_orden(request, pk):
+    orden = get_object_or_404(OrdenCompra, pk=pk)
+    remisiones = orden.remisiones.all().order_by('-fecha_remision')
+    
+    return render(request, 'ordenes_compra/remisiones_orden.html', {
+        'orden': orden,
+        'remisiones': remisiones,
+        'segment': 'ordenes'
+    })

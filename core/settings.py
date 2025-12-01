@@ -172,6 +172,10 @@ STATICFILES_DIRS = (
     os.path.join(CORE_DIR, 'apps/static'),
 )
 
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(CORE_DIR, 'media')
+
 
 #############################################################
 # Cities Light settings

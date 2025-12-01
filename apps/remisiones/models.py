@@ -4,9 +4,17 @@ from apps.ordenes_compra.models import OrdenCompra
 
 
 class Remision(models.Model):
+    ESTADO_FACTURACION_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('cerrado', 'Cerrado'),
+    ]
+    
     numero_remision = models.CharField(max_length=20, unique=True)
     orden = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE, related_name='remisiones')
     fecha_remision = models.DateTimeField(auto_now_add=True)
+    estado_facturacion = models.CharField(max_length=10, choices=ESTADO_FACTURACION_CHOICES, default='pendiente')
+    factura_base64 = models.TextField(blank=True, null=True)
+    factura_nombre = models.CharField(max_length=255, blank=True, null=True)
     
     def save(self, *args, **kwargs):
         if not self.numero_remision:

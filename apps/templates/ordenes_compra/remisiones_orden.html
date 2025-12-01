@@ -1,0 +1,66 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Remisiones de Orden {% endblock %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-primary">
+                        <h4 class="card-title">Remisiones - Orden {{ orden.codigo_oc }}</h4>
+                        <p class="card-category">Cliente: {{ orden.cliente.nombre_cliente }}</p>
+                    </div>
+                    <div class="card-body">
+                        {% if remisiones %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class="text-primary">
+                                    <th>Número Remisión</th>
+                                    <th>Fecha</th>
+                                    <th>Estado Facturación</th>
+                                    <th>Acciones</th>
+                                </thead>
+                                <tbody>
+                                    {% for remision in remisiones %}
+                                    <tr>
+                                        <td>{{ remision.numero_remision }}</td>
+                                        <td>{{ remision.fecha_remision|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="badge badge-{% if remision.estado_facturacion == 'cerrado' %}success{% else %}warning{% endif %}">
+                                                {{ remision.get_estado_facturacion_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'detalle_remision' remision.id %}" class="btn btn-primary btn-sm">Ver</a>
+                                            {% if remision.estado_facturacion == 'pendiente' %}
+                                                <a href="{% url 'subir_factura' remision.id %}" class="btn btn-success btn-sm">Adjuntar Factura</a>
+                                            {% else %}
+                                                {% if remision.factura_base64 %}
+                                                    <a href="{% url 'ver_factura' remision.id %}" target="_blank" class="btn btn-info btn-sm">Ver Factura</a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p>No hay remisiones para esta orden.</p>
+                        {% endif %}
+                        <a href="{% url 'lista_ordenes_compra' %}" class="btn btn-default">Volver a Órdenes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

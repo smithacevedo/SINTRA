@@ -3,6 +3,15 @@
 {% block title %}Remisiones{% endblock %}
 
 {% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -11,26 +20,32 @@
                 <p class="card-category">Todas las remisiones generadas</p>
             </div>
             <div class="card-body">
-                <!-- Campo de búsqueda -->
+                <!-- Campo de búsqueda y filtros -->
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <form method="get" class="form-inline">
-                            <div class="input-group">
+                            <div class="input-group mr-3">
                                 <input type="text" name="buscar" class="form-control" 
                                        style="width: 250px;" 
                                        placeholder="Buscar por número de remisión..." 
                                        value="{{ buscar }}">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="material-icons">search</i>
-                                    </button>
-                                    {% if buscar %}
-                                    <a href="{% url 'lista_remisiones' %}" class="btn btn-secondary">
-                                        <i class="material-icons">clear</i>
-                                    </a>
-                                    {% endif %}
-                                </div>
                             </div>
+                            <div class="form-group mr-3">
+                                <select name="estado_facturacion" class="form-control" 
+                                        style="background: #6c757d; color: white; border-radius: 5px; padding: 5px 10px;">
+                                    <option value="">Todos los estados</option>
+                                    <option value="pendiente" {% if estado_facturacion == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                    <option value="cerrado" {% if estado_facturacion == 'cerrado' %}selected{% endif %}>Cerrado</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary mr-2">
+                                <i class="material-icons">search</i> Filtrar
+                            </button>
+                            {% if buscar or estado_facturacion %}
+                            <a href="{% url 'lista_remisiones' %}" class="btn btn-secondary">
+                                <i class="material-icons">clear</i> Limpiar
+                            </a>
+                            {% endif %}
                         </form>
                     </div>
                 </div>
@@ -44,6 +59,7 @@
                                 <th>Orden</th>
                                 <th>Cliente</th>
                                 <th>Fecha</th>
+                                <th>Estado Facturación</th>
                                 <th>Productos</th>
                                 <th>Acciones</th>
                             </tr>
@@ -56,21 +72,45 @@
                                 <td>{{ remision.orden.cliente.nombre_cliente }}</td>
                                 <td>{{ remision.fecha_remision|date:"d/m/Y H:i" }}</td>
                                 <td>
+                                    <span class="badge badge-{% if remision.estado_facturacion == 'cerrado' %}success{% else %}warning{% endif %}">
+                                        {{ remision.get_estado_facturacion_display }}
+                                    </span>
+                                </td>
+                                <td>
                                     <span class="badge badge-info">{{ remision.detalles.count }} productos</span>
                                 </td>
                                 <td>
                                     <a href="{% url 'detalle_remision' remision.id %}" class="btn btn-sm btn-primary">
-                                        <i class="material-icons">visibility</i> Ver Detalle
+                                        <i class="material-icons">visibility</i> Ver
                                     </a>
-                                    <!-- Botón de descargar EXCEL
-                                    <button type="button" class="btn btn-sm btn-success" style="margin-left:6px;" 
-                                            onclick="abrirModalDescarga('{{ remision.id }}', 'excel')">
-                                        <i class="material-icons">file_download</i> Descargar Excel
-                                    </button>-->
-                                    <!-- Botón de descargar PDF -->
-                                    <button type="button" class="btn btn-sm btn-danger" style="margin-left:6px;" 
+                                    {% if remision.estado_facturacion == 'pendiente' %}
+                                        <a href="{% url 'subir_factura' remision.id %}" class="btn btn-sm btn-success">
+                                            <i class="material-icons">attach_file</i> Adjuntar Factura
+                                        </a>
+                                        <form method="post" action="{% url 'cambiar_estado_facturacion' remision.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="estado" value="cerrado">
+                                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('¿Marcar como cerrado?')">
+                                                <i class="material-icons">check</i> Cerrar
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        {% if remision.factura_base64 %}
+                                            <a href="{% url 'ver_factura' remision.id %}" target="_blank" class="btn btn-sm btn-info">
+                                                <i class="material-icons">description</i> Ver Factura
+                                            </a>
+                                        {% endif %}
+                                        <form method="post" action="{% url 'cambiar_estado_facturacion' remision.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="estado" value="pendiente">
+                                            <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('¿Marcar como pendiente?')">
+                                                <i class="material-icons">undo</i> Reabrir
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-danger" 
                                             onclick="abrirModalDescarga('{{ remision.id }}', 'pdf')">
-                                        <i class="material-icons">picture_as_pdf</i> Descargar PDF
+                                        <i class="material-icons">picture_as_pdf</i> PDF
                                     </button>
                                 </td>
                             </tr>

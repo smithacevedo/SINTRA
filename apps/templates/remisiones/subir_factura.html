@@ -1,0 +1,98 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Subir Factura {% endblock %}
+
+{% block stylesheets %}
+<style>
+.custom-file-label::after {
+    content: "Examinar";
+}
+.form-group {
+    margin-bottom: 2rem;
+}
+.btn {
+    margin-right: 10px;
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header card-header-primary">
+                        <h4 class="card-title">Subir Factura - Remisión {{ remision.numero_remision }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="factura" style="font-weight: bold; margin-bottom: 15px;">Seleccionar Archivo de Factura</label>
+                                        <div class="custom-file">
+                                            <input type="file" id="factura" name="factura" class="custom-file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                                            <label class="custom-file-label" for="factura">Elegir archivo...</label>
+                                        </div>
+                                        <small class="form-text text-muted mt-2">Formatos: PDF, JPG, JPEG, PNG (Máx. 10MB)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary pull-right">Subir Factura</button>
+                            <a href="{% url 'lista_remisiones' %}" class="btn btn-default">Cancelar</a>
+                            <div class="clearfix"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+// Bootstrap file input
+$('.custom-file-input').on('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const fileName = file.name;
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        
+        // Validar tamaño
+        if (file.size > 10 * 1024 * 1024) {
+            alert('El archivo es demasiado grande. Máximo 10MB.');
+            $(this).val('');
+            $(this).next('.custom-file-label').text('Elegir archivo...');
+            return;
+        }
+        
+        // Actualizar label
+        $(this).next('.custom-file-label').text(fileName);
+        console.log('Archivo seleccionado:', fileName, 'Tamaño:', fileSize + 'MB');
+    }
+});
+
+// Validación del formulario
+$('form').on('submit', function(e) {
+    const fileInput = $('#factura')[0];
+    if (!fileInput.files || fileInput.files.length === 0) {
+        e.preventDefault();
+        alert('Por favor selecciona un archivo.');
+        return false;
+    }
+});
+</script>
+{% endblock javascripts %}
