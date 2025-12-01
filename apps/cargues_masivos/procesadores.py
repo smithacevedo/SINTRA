@@ -4,6 +4,7 @@ from apps.productos.models import Producto
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from cities_light.models import City
+from apps.proveedores.models import Proveedor
 from apps.proyectos.models import Proyectos
 
 
@@ -287,6 +288,93 @@ def procesar_cargue_proyectos(archivo):
             except Exception as e:
                 resultados['errores'].append(f"Error al guardar proyectos en la base de datos: {str(e)}")
                 resultados['fallidos'] = len(proyectos_a_crear)
+                return resultados
+    except Exception as e:
+        resultados['errores'].append(f"Error al leer el archivo: {str(e)}")
+        resultados['fallidos'] += 1
+    return resultados
+
+def procesar_cargue_proveedores(archivo):
+    """
+    Procesa el archivo Excel de proveedores y crea registros nuevos.
+    Si encuentra un proveedor existente o hay errores, cancela todo el cargue.
+    Autor: Jeison Acevedo
+    """
+
+    wb = load_workbook(archivo)
+    ws = wb.active
+    resultados = {
+        'exitosos': 0,
+        'fallidos': 0,
+        'errores': []
+    }
+    proveedores_a_crear = []
+    try:
+        for fila_num, fila in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            try:
+                if not any(fila):
+                    continue
+                nombre_original = str(fila[0]).strip() if fila[0] else None
+                nombre = nombre_original.lower() if nombre_original else None
+                nit = str(fila[1]).strip() if fila[1] else None
+                correo = str(fila[2]).strip() if fila[2] else None
+                asesor_contacto = str(fila[3]).strip() if fila[3] else None
+                telefono = str(fila[4]).strip() if fila[4] else None
+                productos_suministra = str(fila[5]).strip() if fila[5] else None
+
+                campos = [nombre, nit, correo, asesor_contacto, telefono, productos_suministra]
+                if not all(campos):
+                    resultados['errores'].append(f"Fila {fila_num}: Algún campo está vacío")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                for p in Proveedor.objects.all():
+                    if p.nombre and p.nombre.strip().lower() == nombre:
+                        resultados['errores'].append(f"Fila {fila_num}: El proveedor con nombre '{nombre_original}' ya existe")
+                        resultados['fallidos'] += 1
+                        wb.close()
+                        return resultados
+                if Proveedor.objects.filter(nit=nit).exists():
+                    resultados['errores'].append(f"Fila {fila_num}: El proveedor con NIT '{nit}' ya existe")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                if '-' not in nit:
+                    resultados['errores'].append(f"Fila {fila_num}: El NIT '{nit}' debe contener un guión (-)")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+                partes_nit = nit.split('-')
+                if len(partes_nit) != 2 or not partes_nit[0].isdigit() or not partes_nit[1].isdigit():
+                    resultados['errores'].append(f"Fila {fila_num}: El NIT '{nit}' debe ser numérico en ambas partes separadas por guión")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                proveedores_a_crear.append(Proveedor(
+                    nombre=nombre_original,
+                    nit=nit,
+                    correo=correo,
+                    asesor_contacto=asesor_contacto,
+                    telefono=telefono,
+                    productos_suministra=productos_suministra
+                ))
+            except Exception as e:
+                resultados['errores'].append(f"Fila {fila_num}: Error procesando - {str(e)}")
+                resultados['fallidos'] += 1
+                wb.close()
+                return resultados
+        wb.close()
+        if proveedores_a_crear:
+            try:
+                with transaction.atomic():
+                    Proveedor.objects.bulk_create(proveedores_a_crear)
+                    resultados['exitosos'] = len(proveedores_a_crear)
+            except Exception as e:
+                resultados['errores'].append(f"Error al guardar proveedores en la base de datos: {str(e)}")
+                resultados['fallidos'] = len(proveedores_a_crear)
                 return resultados
     except Exception as e:
         resultados['errores'].append(f"Error al leer el archivo: {str(e)}")

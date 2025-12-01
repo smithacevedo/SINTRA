@@ -86,9 +86,9 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Dirección</label>
-                                <input type="text" class="form-control" name="direccion"
-                                    value="{{ form.direccion.value|default_if_none:'' }}">
+                                <label class="bmd-label-floating">Asesor de contacto</label>
+                                <input type="text" class="form-control" name="asesor_contacto"
+                                    value="{{ form.asesor_contacto.value|default_if_none:'' }}">
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label class="bmd-label-floating">Productos que suministra</label>
+                                <label class="bmd-label-floating">Productos o servicios que suministra</label>
                                 <textarea class="form-control" name="productos_suministra"
                                     rows="3">{{ form.productos_suministra.value|default_if_none:'' }}</textarea>
                             </div>
