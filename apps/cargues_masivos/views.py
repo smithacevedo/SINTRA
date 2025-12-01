@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CargaMasivaForm
-from .procesadores import procesar_cargue_clientes, procesar_cargue_productos, procesar_cargue_proyectos
+from .procesadores import procesar_cargue_clientes, procesar_cargue_productos, procesar_cargue_proveedores, procesar_cargue_proyectos
 
 
 @login_required
@@ -83,6 +83,17 @@ def cargue_detalle(request, tipo_cargue):
 
                 if resultados['exitosos'] > 0:
                     messages.success(request, f"Cargue exitoso: {resultados['exitosos']} proyectos creados")
+
+                if resultados['fallidos'] > 0 and len(resultados['errores']) > 0:
+                    for error in resultados['errores']:
+                        messages.error(request, error)
+
+            # CARGUE DE PROVEEDORES
+            elif tipo_cargue == 'proveedores':
+                resultados = procesar_cargue_proveedores(archivo)
+
+                if resultados['exitosos'] > 0:
+                    messages.success(request, f"Cargue exitoso: {resultados['exitosos']} proveedores creados")
 
                 if resultados['fallidos'] > 0 and len(resultados['errores']) > 0:
                     for error in resultados['errores']:
