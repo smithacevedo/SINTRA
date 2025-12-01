@@ -6,7 +6,7 @@ class Proveedor(models.Model):
     telefono = models.CharField(max_length=20)
     correo = models.EmailField()
     asesor_contacto = models.CharField(max_length=200)
-    productos_suministra = models.TextField(help_text="Lista de productos que suministra")
+    productos_suministra = models.TextField(help_text="Lista de productos o servicios que suministra")
 
     def __str__(self):
         return self.nombre

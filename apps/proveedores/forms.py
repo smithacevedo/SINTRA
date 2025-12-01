@@ -1,5 +1,6 @@
 from django import forms
 from .models import Proveedor
+import re
 
 class ProveedorForm(forms.ModelForm):
     class Meta:
@@ -8,11 +9,11 @@ class ProveedorForm(forms.ModelForm):
 
     def clean_nit(self):
         nit = self.cleaned_data.get('nit')
-        if nit and not nit.isdigit():
-            raise forms.ValidationError("El NIT debe contener solo números.")
-        
+        if not nit or not re.fullmatch(r'\d+-\d+', nit):
+            raise forms.ValidationError("El NIT debe contener solo números y un guión obligatorio (ejemplo: 12345678-9).")
+
         qs = Proveedor.objects.filter(nit=nit)
-        if self.instance.pk:  
+        if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
             raise forms.ValidationError("Ya existe un proveedor registrado con este NIT.")
