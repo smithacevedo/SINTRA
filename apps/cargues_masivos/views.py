@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CargaMasivaForm
-from .procesadores import procesar_cargue_clientes, procesar_cargue_productos
+from .procesadores import procesar_cargue_clientes, procesar_cargue_productos, procesar_cargue_proyectos
 
 
 @login_required
@@ -68,7 +68,7 @@ def cargue_detalle(request, tipo_cargue):
                         messages.error(request, error)
 
             # CARGUE DE CLIENTES
-            if tipo_cargue == 'clientes':
+            elif tipo_cargue == 'clientes':
                 resultados = procesar_cargue_clientes(archivo)
                 if resultados['exitosos'] > 0:
                     messages.success(request, f"Cargue exitoso: {resultados['exitosos']} clientes creados")
@@ -77,8 +77,19 @@ def cargue_detalle(request, tipo_cargue):
                     for error in resultados['errores']:
                         messages.error(request, error)
 
+            # CARGUE DE PROYECTOS
+            elif tipo_cargue == 'proyectos':
+                resultados = procesar_cargue_proyectos(archivo)
+
+                if resultados['exitosos'] > 0:
+                    messages.success(request, f"Cargue exitoso: {resultados['exitosos']} proyectos creados")
+
+                if resultados['fallidos'] > 0 and len(resultados['errores']) > 0:
+                    for error in resultados['errores']:
+                        messages.error(request, error)
+
             else:
-                # Otros tipos de cargue (por ahora solo mensaje)
+                # Otros tipos de cargue
                 messages.info(request, f'Procesamiento de {nombre_cargue} no disponible.')
 
             return redirect('cargues_masivos:lista_cargues')
