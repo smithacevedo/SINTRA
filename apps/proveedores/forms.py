@@ -4,7 +4,7 @@ from .models import Proveedor
 class ProveedorForm(forms.ModelForm):
     class Meta:
         model = Proveedor
-        fields = ['nombre', 'nit', 'telefono', 'correo', 'direccion', 'productos_suministra']
+        fields = ['nombre', 'nit', 'telefono', 'correo', 'asesor_contacto', 'productos_suministra']
 
     def clean_nit(self):
         nit = self.cleaned_data.get('nit')
