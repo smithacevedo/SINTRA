@@ -180,3 +180,8 @@ CITIES_LIGHT_INCLUDE_COUNTRIES = ['CO']  # Solo cargar ciudades de Colombia
 #############################################################
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Session timeout - 30 minutes
+SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
