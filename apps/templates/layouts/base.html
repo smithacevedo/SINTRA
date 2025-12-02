@@ -72,6 +72,11 @@
 
   {% include 'includes/scripts-sidebar.html' %}
   
+  <!-- Session timeout script -->
+  {% if user.is_authenticated %}
+  <script src="/static/assets/js/session-timeout.js"></script>
+  {% endif %}
+  
   <!-- Specific Page JS goes HERE  -->
   {% block javascripts %}{% endblock javascripts %}
   
