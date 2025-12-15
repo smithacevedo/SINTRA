@@ -16,7 +16,7 @@
     .drop-zone {
         border: 2px dashed #9c27b0;
         border-radius: 8px;
-        padding: 40px;
+        padding: 15px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -84,10 +84,6 @@
                     {% csrf_token %}
 
                     <div class="form-group">
-                        <label for="archivo-cargue">
-                            <h5><i class="material-icons" style="vertical-align: middle;">upload_file</i> Cargar Archivo
-                            </h5>
-                        </label>
 
                         <div class="drop-zone" id="drop-zone">
                             <i class="material-icons" style="font-size: 48px; color: #9c27b0;">cloud_upload</i>
