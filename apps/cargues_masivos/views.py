@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CargaMasivaForm
-from .procesadores import procesar_cargue_clientes, procesar_cargue_productos, procesar_cargue_proveedores, procesar_cargue_proyectos, procesar_cargue_ordenes_compra
+from .procesadores import procesar_cargue_clientes, procesar_cargue_despachos, procesar_cargue_productos, procesar_cargue_proveedores, procesar_cargue_proyectos, procesar_cargue_ordenes_compra
 
 
 @login_required
@@ -16,8 +16,7 @@ def lista_cargues(request):
         {'id': 'proyectos', 'nombre': 'Cargar Proyectos'},
         {'id': 'ordenes_compra', 'nombre': 'Cargar Órdenes de Compra'},
         {'id': 'proveedores', 'nombre': 'Cargar Proveedores'},
-        {'id': 'despachos', 'nombre': 'Cargar Despachos'},
-        {'id': 'remisiones', 'nombre': 'Cargar Remisiones'},
+        {'id': 'despachos', 'nombre': 'Cargar Despachos y Remisiones'},
     ]
 
     context = {
@@ -40,8 +39,7 @@ def cargue_detalle(request, tipo_cargue):
         'proyectos': 'Cargar Proyectos',
         'ordenes_compra': 'Cargar Órdenes de Compra',
         'proveedores': 'Cargar Proveedores',
-        'despachos': 'Cargar Despachos',
-        'remisiones': 'Cargar Remisiones',
+        'despachos': 'Cargar Despachos y Remisiones',
     }
 
     if tipo_cargue not in tipos_validos:
@@ -110,6 +108,17 @@ def cargue_detalle(request, tipo_cargue):
                     for error in resultados['errores']:
                         messages.error(request, error)
 
+            # CARGUE DE DESPACHOS
+            elif tipo_cargue == 'despachos':
+                resultados = procesar_cargue_despachos(archivo, request.user)
+
+                if resultados['exitosos'] > 0:
+                    messages.success(request, f"Cargue exitoso: {resultados['exitosos']} despachos creados")
+
+                if resultados['fallidos'] > 0 and len(resultados['errores']) > 0:
+                    for error in resultados['errores']:
+                        messages.error(request, error)
+
             else:
                 # Otros tipos de cargue
                 messages.info(request, f'Procesamiento de {nombre_cargue} no disponible.')
@@ -125,7 +134,6 @@ def cargue_detalle(request, tipo_cargue):
         'ordenes_compra': 'ejemplo_ordenes_compra.xlsx',
         'proveedores': 'ejemplo_proveedores.xlsx',
         'despachos': 'ejemplo_despachos.xlsx',
-        'remisiones': 'ejemplo_remisiones.xlsx',
     }
 
     context = {
