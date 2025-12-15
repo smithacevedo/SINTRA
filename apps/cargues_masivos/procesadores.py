@@ -6,6 +6,10 @@ from django.db import transaction
 from cities_light.models import City
 from apps.proveedores.models import Proveedor
 from apps.proyectos.models import Proyectos
+from apps.ordenes_compra.models import OrdenCompra, ProductoSolicitado
+from datetime import datetime
+from dateutil import parser
+import locale
 
 
 def procesar_cargue_productos(archivo):
@@ -380,3 +384,205 @@ def procesar_cargue_proveedores(archivo):
         resultados['errores'].append(f"Error al leer el archivo: {str(e)}")
         resultados['fallidos'] += 1
     return resultados
+
+
+def procesar_cargue_ordenes_compra(archivo):
+    """
+    Procesa el archivo Excel de órdenes de compra y crea registros nuevos.
+    Si encuentra una orden existente o hay errores, cancela todo el cargue.
+    Autor: Jeison Acevedo
+    """
+
+    resultados = {
+        'exitosos': 0,
+        'fallidos': 0,
+        'errores': []
+    }
+
+    try:
+        wb = load_workbook(archivo)
+        ws = wb.active
+
+        ordenes_dict = {}
+
+        try:
+            locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+        except:
+            try:
+                locale.setlocale(locale.LC_TIME, 'Spanish_Spain.1252')
+            except:
+                pass
+
+        meses_esp = {
+            'ene': 'Jan', 'feb': 'Feb', 'mar': 'Mar', 'abr': 'Apr',
+            'may': 'May', 'jun': 'Jun', 'jul': 'Jul', 'ago': 'Aug',
+            'sep': 'Sep', 'oct': 'Oct', 'nov': 'Nov', 'dic': 'Dec'
+        }
+
+        for fila_num, fila in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+            try:
+                if not any(fila):
+                    continue
+
+                # A: CODIGO OC
+                codigo_oc = str(fila[0]).strip() if fila[0] else None
+                if not codigo_oc:
+                    resultados['errores'].append(f"Fila {fila_num}: Código de OC es obligatorio")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                # B: FECHA SOLICITUD
+                fecha_str = str(fila[1]).strip() if fila[1] else None
+                if not fecha_str:
+                    resultados['errores'].append(f"Fila {fila_num}: Fecha de solicitud es obligatoria para OC '{codigo_oc}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                try:
+                    fecha_lower = fecha_str.lower()
+                    for mes_esp, mes_eng in meses_esp.items():
+                        fecha_lower = fecha_lower.replace(mes_esp, mes_eng)
+
+                    try:
+                        fecha_solicitud = parser.parse(fecha_lower, dayfirst=True).date()
+                    except:
+                        fecha_solicitud = datetime.strptime(fecha_str, '%d-%m-%Y').date()
+                except Exception as e:
+                    resultados['errores'].append(f"Fila {fila_num}: Formato de fecha inválido '{fecha_str}' para OC '{codigo_oc}'. Use formato como '21-dic-2021' o '21-12-2021'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                # C: CLIENTE
+                nombre_cliente = str(fila[2]).strip() if fila[2] else None
+                if not nombre_cliente:
+                    resultados['errores'].append(f"Fila {fila_num}: Cliente es obligatorio para OC '{codigo_oc}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                try:
+                    cliente = Clientes.objects.get(nombre_cliente__iexact=nombre_cliente)
+                except Clientes.DoesNotExist:
+                    resultados['errores'].append(f"Fila {fila_num}: El cliente '{nombre_cliente}' no existe.")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                # D: PROYECTO
+                nombre_proyecto = str(fila[3]).strip() if fila[3] else None
+                proyecto = None
+
+                if cliente.tiene_proyectos:
+                    if not nombre_proyecto:
+                        resultados['errores'].append(f"Fila {fila_num}: El cliente '{nombre_cliente}' requiere un proyecto asignado")
+                        resultados['fallidos'] += 1
+                        wb.close()
+                        return resultados
+
+                    try:
+                        proyecto = Proyectos.objects.get(nombre_proyecto__iexact=nombre_proyecto, cliente=cliente)
+                    except Proyectos.DoesNotExist:
+                        resultados['errores'].append(f"Fila {fila_num}: El proyecto '{nombre_proyecto}' no está registrado para el cliente '{nombre_cliente}'")
+                        resultados['fallidos'] += 1
+                        wb.close()
+                        return resultados
+
+                # E: PRODUCTO
+                referencia_producto = str(fila[4]).strip() if fila[4] else None
+                if not referencia_producto:
+                    resultados['errores'].append(f"Fila {fila_num}: Referencia de producto es obligatoria para OC '{codigo_oc}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                try:
+                    producto = Producto.objects.get(referencia__iexact=referencia_producto)
+                except Producto.DoesNotExist:
+                    resultados['errores'].append(f"Fila {fila_num}: El producto con referencia '{referencia_producto}' no existe.")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                # F: DESCRIPCIÓN EN OC
+                descripcion = str(fila[5]).strip() if fila[5] else None
+                if not descripcion:
+                    resultados['errores'].append(f"Fila {fila_num}: Descripción es obligatoria para OC '{codigo_oc}' producto '{referencia_producto}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                # G: CANTIDAD
+                cantidad = fila[6]
+                if not cantidad:
+                    resultados['errores'].append(f"Fila {fila_num}: Cantidad es obligatoria para OC '{codigo_oc}' producto '{referencia_producto}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                try:
+                    cantidad = int(cantidad)
+                    if cantidad <= 0:
+                        raise ValueError
+                except (ValueError, TypeError):
+                    resultados['errores'].append(f"Fila {fila_num}: Cantidad inválida '{cantidad}' para OC '{codigo_oc}' producto '{referencia_producto}'. Debe ser un número positivo")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                # Agrupar productos por orden de compra
+                if codigo_oc not in ordenes_dict:
+                    ordenes_dict[codigo_oc] = {
+                        'cliente': cliente,
+                        'proyecto': proyecto,
+                        'fecha_solicitud': fecha_solicitud,
+                        'productos': []
+                    }
+
+                ordenes_dict[codigo_oc]['productos'].append({
+                    'producto': producto,
+                    'cantidad': cantidad,
+                    'descripcion': descripcion
+                })
+
+            except Exception as e:
+                resultados['errores'].append(f"Fila {fila_num}: Error inesperado - {str(e)}")
+                resultados['fallidos'] += 1
+                wb.close()
+                return resultados
+
+        with transaction.atomic():
+            for codigo_oc, datos_orden in ordenes_dict.items():
+                # Verificar si la orden ya existe
+                if OrdenCompra.objects.filter(codigo_oc=codigo_oc).exists():
+                    resultados['errores'].append(f"La orden de compra '{codigo_oc}' ya existe en el sistema")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                orden = OrdenCompra.objects.create(
+                    codigo_oc=codigo_oc,
+                    cliente=datos_orden['cliente'],
+                    proyecto=datos_orden['proyecto'],
+                    fecha_solicitud=datos_orden['fecha_solicitud']
+                )
+
+                for producto_data in datos_orden['productos']:
+                    ProductoSolicitado.objects.create(
+                        orden=orden,
+                        producto=producto_data['producto'],
+                        cantidad=producto_data['cantidad'],
+                        descripcion=producto_data['descripcion']
+                    )
+
+                resultados['exitosos'] += 1
+
+        wb.close()
+        return resultados
+
+    except Exception as e:
+        resultados['errores'].append(f"Error al procesar el archivo: {str(e)}")
+        resultados['fallidos'] += 1
+        return resultados
