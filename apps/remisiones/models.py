@@ -12,7 +12,7 @@ class Remision(models.Model):
         if not self.numero_remision:
             ultimo = Remision.objects.order_by('-id').first()
             numero = 1 if not ultimo else int(ultimo.numero_remision.split('-')[1]) + 1
-            self.numero_remision = f"REM-{numero:06d}"
+            self.numero_remision = f"REM-{numero}"
         super().save(*args, **kwargs)
     
     def __str__(self):
