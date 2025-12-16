@@ -87,26 +87,18 @@
                                         <a href="{% url 'subir_factura' remision.id %}" class="btn btn-sm btn-success">
                                             <i class="material-icons">attach_file</i> Adjuntar Factura
                                         </a>
-                                        <form method="post" action="{% url 'cambiar_estado_facturacion' remision.id %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="cerrado">
-                                            <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('¿Marcar como cerrado?')">
-                                                <i class="material-icons">check</i> Cerrar
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-warning" onclick="abrirModalCerrar('{{ remision.id }}')">
+                                            <i class="material-icons">check</i> Cerrar
+                                        </button>
                                     {% else %}
                                         {% if remision.factura_base64 %}
                                             <a href="{% url 'ver_factura' remision.id %}" target="_blank" class="btn btn-sm btn-info">
                                                 <i class="material-icons">description</i> Ver Factura
                                             </a>
                                         {% endif %}
-                                        <form method="post" action="{% url 'cambiar_estado_facturacion' remision.id %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="estado" value="pendiente">
-                                            <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('¿Marcar como pendiente?')">
-                                                <i class="material-icons">undo</i> Reabrir
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-secondary" onclick="abrirModalPendiente('{{ remision.id }}')">
+                                            <i class="material-icons">undo</i> Reabrir
+                                        </button>
                                     {% endif %}
                                     <button type="button" class="btn btn-sm btn-danger" 
                                             onclick="abrirModalDescarga('{{ remision.id }}', 'pdf')">
@@ -163,7 +155,51 @@
     </div>
 </div>
 
+<!-- Modal para confirmar cerrar remisión -->
+<div class="modal fade" id="modalCerrar" tabindex="-1" role="dialog" aria-labelledby="modalCerrarLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCerrarLabel">Confirmar Acción</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Marcar como cerrado?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="confirmarCerrar()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar marcar como pendiente -->
+<div class="modal fade" id="modalPendiente" tabindex="-1" role="dialog" aria-labelledby="modalPendienteLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPendienteLabel">Confirmar Acción</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Marcar como pendiente?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="confirmarPendiente()">Reabrir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+let remisionIdActual = null;
+
 function abrirModalDescarga(remisionId, tipo) {
     const form = document.getElementById('formDescarga');
     const baseUrl = tipo === 'excel' 
@@ -173,6 +209,58 @@ function abrirModalDescarga(remisionId, tipo) {
     form.action = baseUrl;
     document.getElementById('nombreReceptor').value = '';
     $('#modalReceptor').modal('show');
+}
+
+function abrirModalCerrar(remisionId) {
+    remisionIdActual = remisionId;
+    $('#modalCerrar').modal('show');
+}
+
+function abrirModalPendiente(remisionId) {
+    remisionIdActual = remisionId;
+    $('#modalPendiente').modal('show');
+}
+
+function confirmarCerrar() {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{% url 'cambiar_estado_facturacion' 0 %}".replace('0', remisionIdActual);
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrfmiddlewaretoken';
+    csrfToken.value = '{{ csrf_token }}';
+    
+    const estado = document.createElement('input');
+    estado.type = 'hidden';
+    estado.name = 'estado';
+    estado.value = 'cerrado';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(estado);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function confirmarPendiente() {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{% url 'cambiar_estado_facturacion' 0 %}".replace('0', remisionIdActual);
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrfmiddlewaretoken';
+    csrfToken.value = '{{ csrf_token }}';
+    
+    const estado = document.createElement('input');
+    estado.type = 'hidden';
+    estado.name = 'estado';
+    estado.value = 'pendiente';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(estado);
+    document.body.appendChild(form);
+    form.submit();
 }
 </script>
 {% endblock %}
