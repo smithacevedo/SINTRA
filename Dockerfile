@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libpq-dev libjpeg62-turbo-dev zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Instala LibreOffice
+RUN apt-get update && apt-get install -y libreoffice
+
 # Requisitos
 COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
