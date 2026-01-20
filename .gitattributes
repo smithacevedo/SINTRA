@@ -1,0 +1,3 @@
+# Mantener siempre la versión local (no hacer merge)
+docker-compose.yml merge=ours
+.env merge=ours
