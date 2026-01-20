@@ -14,6 +14,7 @@ class ListaproveedoresView(ListView):
     model = Proveedor
     template_name = 'proveedores/lista_proveedores.html'
     context_object_name = 'proveedores'
+    paginate_by = 15
     
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

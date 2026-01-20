@@ -16,7 +16,16 @@
         </a>
       </li>
       {% endif %}
-      
+
+      {% if 'ver_cargues_masivos' in permisos_usuario %}
+      <li class="nav-item {% if 'cargues_masivos' in segment %} active {% endif %}">
+        <a class="nav-link" href="{% url 'cargues_masivos:lista_cargues' %}">
+          <i class="material-icons">cloud_upload</i>
+          <p>Cargues Masivos</p>
+        </a>
+      </li>
+      {% endif %}
+
       {% if 'ver_productos' in permisos_usuario %}
       <li class="nav-item {% if 'productos' in segment %} active {% endif %}">
         <a class="nav-link" href="{% url 'lista_productos' %}">

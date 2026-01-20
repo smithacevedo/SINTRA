@@ -7,9 +7,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Dependencias del sistema (psycopg2 y pillow suelen necesitar estos)
+# Dependencias del sistema (psycopg2, pillow y LibreOffice)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libpq-dev libjpeg62-turbo-dev zlib1g-dev \
+    build-essential \
+    libpq-dev \
+    libjpeg62-turbo-dev \
+    zlib1g-dev \
+    libreoffice \
+    libreoffice-writer \
+    fonts-dejavu \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala LibreOffice

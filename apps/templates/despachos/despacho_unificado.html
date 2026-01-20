@@ -3,6 +3,16 @@
 {% block title %}Despacho - Orden {{ orden.codigo_oc }}{% endblock %}
 
 {% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">

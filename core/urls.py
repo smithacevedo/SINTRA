@@ -5,6 +5,8 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django.contrib import admin
 from django.urls import path, include, re_path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from apps.home import views  # add this
 
@@ -22,6 +24,7 @@ urlpatterns = [
     path("roles/", include('apps.roles.urls')),
     path("usuarios/", include('apps.usuarios.urls')),
     path("proyectos/", include("apps.proyectos.urls")),
+    path("cargues-masivos/", include('apps.cargues_masivos.urls')),
    # path("detalles_orden/", include('apps.detalles_orden.urls')), 
 
 
@@ -29,3 +32,7 @@ urlpatterns = [
     #re_path(r'^(?!productos/|ventas/|clientes/).*\.html$', views.pages, name='pages'), CUANDO SEAN VARIOS
     re_path(r'^(?!productos/|clientes/).*\.html$', views.pages, name='pages'),
 ]
+
+# Servir archivos de medios en desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
