@@ -18,8 +18,9 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-# load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'sintra.vanisa.cloud', '195.35.9.243', config('SERVER', default='127.0.0.1')]
+# ALLOWED_HOSTS solo desde .env (por ambiente)
+_env_hosts = config('ALLOWED_HOSTS', default='')
+ALLOWED_HOSTS = [h.strip() for h in _env_hosts.split(',') if h.strip()]
 
 # Todos los proyecto usen BigAutoField por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
