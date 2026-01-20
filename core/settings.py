@@ -19,7 +19,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'sintra.vanisa.cloud', '195.35.9.243', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'pruebas.sintra.vanisa.cloud', '195.35.9.243', config('SERVER', default='127.0.0.1')]
 
 # Todos los proyecto usen BigAutoField por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'apps.roles',
     'apps.usuarios',
     'apps.proyectos',
-    #'apps.detalles_orden',
+    'apps.cargues_masivos',
 ]
 
 MIDDLEWARE = [
@@ -172,6 +172,10 @@ STATICFILES_DIRS = (
     os.path.join(CORE_DIR, 'apps/static'),
 )
 
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(CORE_DIR, 'media')
+
 
 #############################################################
 # Cities Light settings
@@ -180,3 +184,8 @@ CITIES_LIGHT_INCLUDE_COUNTRIES = ['CO']  # Solo cargar ciudades de Colombia
 #############################################################
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# Session timeout - 30 minutes
+SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True

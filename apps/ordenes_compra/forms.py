@@ -14,7 +14,15 @@ class OrdenCompraForm(forms.ModelForm):
                 'type': 'date'
             }),
             'codigo_oc': forms.TextInput(attrs={'class': 'form-control'}),
+            'estado_orden': forms.Select(attrs={'class': 'form-control'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si es una nueva orden (no tiene pk), ocultar el campo estado_orden
+        if not self.instance.pk:
+            self.fields['estado_orden'].widget = forms.HiddenInput()
+            self.fields['estado_orden'].initial = 'generada'
 
     def clean_codigo_oc(self):
         codigo_oc = self.cleaned_data.get('codigo_oc')
@@ -24,7 +32,7 @@ class OrdenCompraForm(forms.ModelForm):
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
                 raise forms.ValidationError('Ya existe una orden de compra con este código.')
-            return codigo_oc
+        return codigo_oc
 
 class ProductoSolicitadoForm(forms.ModelForm):
     class Meta:

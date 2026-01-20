@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from apps.ordenes_compra.models import ProductoSolicitado
+from django.utils import timezone
 
 
 class Despacho(models.Model):
@@ -9,7 +10,7 @@ class Despacho(models.Model):
         on_delete=models.CASCADE,
         related_name="despachos"
     )
-    fecha_despacho = models.DateTimeField(auto_now_add=True)
+    fecha_despacho = models.DateTimeField(default=timezone.now)
     cantidad = models.PositiveIntegerField()
     reintegro = models.BooleanField(default=False)
     fecha_reintegro = models.DateTimeField(null=True, blank=True)
