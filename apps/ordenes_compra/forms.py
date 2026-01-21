@@ -19,9 +19,10 @@ class OrdenCompraForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Si es una nueva orden (no tiene pk), ocultar el campo estado_orden
+        self.fields['estado_orden'].widget = forms.HiddenInput()
+
+        # Si es una nueva orden (no tiene pk), establecer estado inicial a 'generada'
         if not self.instance.pk:
-            self.fields['estado_orden'].widget = forms.HiddenInput()
             self.fields['estado_orden'].initial = 'generada'
 
     def clean_codigo_oc(self):
