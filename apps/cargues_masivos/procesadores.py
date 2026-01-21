@@ -729,6 +729,12 @@ def procesar_cargue_despachos(archivo, usuario=None):
                     wb.close()
                     return resultados
 
+                if not numero_remision.isdigit():
+                    resultados['errores'].append(f"Fila {fila_num}: El número de remisión '{numero_remision}' debe ser numérico")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
                 # Agrupar despachos por remisión
                 if numero_remision not in remisiones_a_crear:
                     remisiones_a_crear[numero_remision] = {
