@@ -30,7 +30,8 @@ def lista_usuarios(request):
     return render(request, 'usuarios/lista_usuarios.html', {
         'usuarios': page_obj,
         'page_obj': page_obj,
-        'solo_lectura': solo_lectura
+        'solo_lectura': solo_lectura,
+        'segment': 'usuarios'
     })
 
 

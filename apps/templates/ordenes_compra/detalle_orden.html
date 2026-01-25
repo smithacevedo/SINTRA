@@ -1,0 +1,131 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Detalle Orden de Compra {% endblock %}
+
+{% block stylesheets %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="card-title mt-0">Detalle de Orden de Compra</h4>
+                </div>
+                <a href="{% url 'lista_ordenes_compra' %}" class="btn btn-secondary btn-sm">Volver</a>
+            </div>
+            <div class="card-body">
+                <!-- Información de la Orden -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Información de la Orden</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Código OC:</strong></td>
+                                <td>{{ orden.codigo_oc }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cliente:</strong></td>
+                                <td>{{ orden.cliente.nombre_cliente }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Proyecto:</strong></td>
+                                <td>{% if orden.proyecto %}{{ orden.proyecto.nombre_proyecto }}{% else %}No aplica{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha de Solicitud:</strong></td>
+                                <td>{{ orden.fecha_solicitud }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estado:</strong></td>
+                                <td>
+                                    <span class="badge badge-{% if orden.actualizar_estado == 'finalizada' %}success{% elif orden.actualizar_estado == 'parcial' %}warning{% else %}secondary{% endif %}">
+                                        {{ orden.get_estado_orden_display|default:orden.actualizar_estado|capfirst }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detalles de Productos -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>Detalle de Productos</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="text-primary">
+                                    <tr>
+                                        <th>Referencia</th>
+                                        <th>Descripción</th>
+                                        <th>Solicitado</th>
+                                        <th>Despachado</th>
+                                        <th>Pendiente</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for producto in productos %}
+                                    <tr>
+                                        <td>{{ producto.producto.referencia }}</td>
+                                        <td>{{ producto.producto.descripcion }}</td>
+                                        <td>
+                                            <span class="badge badge-info">{{ producto.cantidad }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-success">{{ producto.despachado }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-warning">{{ producto.pendiente }}</span>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No hay productos en esta orden.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Resumen Totales -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card card-stats">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4 text-center">
+                                                <div class="numbers">
+                                                    <p class="category">Total Solicitado</p>
+                                                    <h4 class="title">{{ total_solicitado }}</h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 text-center">
+                                                <div class="numbers">
+                                                    <p class="category">Total Despachado</p>
+                                                    <h4 class="title text-success">{{ total_despachado }}</h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 text-center">
+                                                <div class="numbers">
+                                                    <p class="category">Total Pendiente</p>
+                                                    <h4 class="title text-warning">{{ total_pendiente }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

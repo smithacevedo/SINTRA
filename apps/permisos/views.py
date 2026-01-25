@@ -25,7 +25,8 @@ def lista_permisos(request):
     return render(request, 'permisos/lista_permisos.html', {
         'permisos': page_obj,
         'page_obj': page_obj,
-        'solo_lectura': solo_lectura
+        'solo_lectura': solo_lectura,
+        'segment': 'permisos'
     })
 
 

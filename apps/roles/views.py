@@ -25,7 +25,8 @@ def lista_roles(request):
     return render(request, 'roles/lista_roles.html', {
         'roles': page_obj,
         'page_obj': page_obj,
-        'solo_lectura': solo_lectura
+        'solo_lectura': solo_lectura,
+        'segment': 'roles'
     })
 
 
