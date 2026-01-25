@@ -60,16 +60,19 @@
                                     </span>
                                 </td>
                                 <td class="td-actions text-left">
+                                    <a href="{% url 'detalle_orden' orden.id %}" class="btn btn-info btn-link btn-sm" title="Ver Detalles">
+                                        <i class="material-icons">visibility</i>
+                                    </a>
                                     <a href="{% url 'remisiones_orden' orden.id %}" class="btn btn-info btn-link btn-sm" title="Ver Remisiones">
                                         <i class="material-icons">receipt</i>
                                     </a>
                                     {% if 'editar_pedidos' in permisos_usuario and not solo_lectura %}
-                                    <a href="{% url 'editar_orden_compra' orden.id %}" class="btn btn-primary btn-link btn-sm">
+                                    <a href="{% url 'editar_orden_compra' orden.id %}" class="btn btn-primary btn-link btn-sm" title="Editar">
                                         <i class="material-icons">edit</i>
                                     </a>
                                     {% endif %}
                                     {% if 'eliminar_pedidos' in permisos_usuario and not solo_lectura %}
-                                    <button type="button" class="btn btn-danger btn-link btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ orden.id }}">
+                                    <button type="button" class="btn btn-danger btn-link btn-sm" title="Eliminar orden" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ orden.id }}">
                                         <i class="material-icons">delete</i>
                                     </button>
                                     {% endif %}

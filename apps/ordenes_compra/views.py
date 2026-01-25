@@ -149,3 +149,23 @@ def remisiones_orden(request, pk):
         'remisiones': remisiones,
         'segment': 'ordenes'
     })
+
+
+@requiere_permiso('ver_pedidos')
+def detalle_orden(request, pk):
+    orden = get_object_or_404(OrdenCompra, pk=pk)
+    productos = orden.productos.all()
+
+    # Calcular totales
+    total_solicitado = sum(p.cantidad for p in productos)
+    total_despachado = sum(p.despachado for p in productos)
+    total_pendiente = sum(p.pendiente for p in productos)
+
+    return render(request, 'ordenes_compra/detalle_orden.html', {
+        'orden': orden,
+        'productos': productos,
+        'total_solicitado': total_solicitado,
+        'total_despachado': total_despachado,
+        'total_pendiente': total_pendiente,
+        'segment': 'ordenes'
+    })
