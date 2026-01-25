@@ -27,7 +27,7 @@
             </p>
           </a>
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-            <a class="dropdown-item" href="/page-user.html">Perfil</a>
+            <span class="dropdown-header">Bienvenido, <span class="text-primary">{{ request.user.username }}</span></span>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a>
           </div>
