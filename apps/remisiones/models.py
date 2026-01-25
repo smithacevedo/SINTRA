@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import IntegerField
+from django.db.models.functions import Cast
 from apps.despachos.models import Despacho
 from apps.ordenes_compra.models import OrdenCompra
 
@@ -18,9 +20,11 @@ class Remision(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.numero_remision:
-            ultimo = Remision.objects.order_by('-id').first()
-            numero = 1 if not ultimo else int(ultimo.numero_remision.split('-')[1]) + 1
-            self.numero_remision = f"REM-{numero}"
+            ultimo = Remision.objects.annotate(
+                num=Cast('numero_remision', IntegerField())
+            ).order_by('-num').first()
+            numero = 1 if not ultimo or ultimo.num is None else int(ultimo.num) + 1
+            self.numero_remision = str(numero)
         super().save(*args, **kwargs)
     
     def __str__(self):
