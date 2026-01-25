@@ -16,7 +16,7 @@ def buscar_orden(request):
                 return redirect("despacho_unificado", codigo_oc=orden.codigo_oc)
             except OrdenCompra.DoesNotExist:
                 messages.error(request, f"La orden {codigo_oc} no existe.")
-    return render(request, "despachos/buscar_orden.html")
+    return render(request, "despachos/buscar_orden.html", {'segment': 'despachos'})
 
 
 @requiere_permiso('crear_despachos')
@@ -76,6 +76,7 @@ def despacho_unificado(request, codigo_oc):
         'orden': orden,
         'productos_pendientes': productos_pendientes,
         'productos_despachados': productos_despachados,
+        'segment': 'despachos',
     })
 
 

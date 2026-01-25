@@ -43,7 +43,8 @@ def lista_remisiones(request):
         'remisiones': page_obj,
         'page_obj': page_obj,
         'buscar': buscar,
-        'estado_facturacion': estado_facturacion
+        'estado_facturacion': estado_facturacion,
+        'segment': 'remisiones'
     })
 
 
