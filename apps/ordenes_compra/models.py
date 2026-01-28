@@ -29,10 +29,15 @@ class OrdenCompra(models.Model):
             return 'generada'
         
         total_solicitado = sum(p.cantidad for p in productos)
-        if total_despachado >= total_solicitado:
+        remisiones = self.remisiones.all()
+        facturas_pendientes = remisiones.filter(estado_facturacion='pendiente').exists()
+        
+        if total_despachado >= total_solicitado and not facturas_pendientes:
             return 'finalizada'
-        else:
+        elif total_despachado > 0:
             return 'parcial'
+        else:
+            return 'generada'
 
     def __str__(self):
         return f"Orden de {self.cliente.nombre_cliente} - {self.fecha_solicitud}"

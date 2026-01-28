@@ -55,7 +55,7 @@
                                 </td>
                                 <td>{{ orden.fecha_solicitud }}</td>
                                 <td>
-                                    <span class="badge badge-{% if orden.actualizar_estado == 'finalizada' %}success{% elif orden.actualizar_estado == 'parcial' %}warning{% else %}secondary{% endif %}">
+                                    <span class="badge badge-{% if orden.actualizar_estado == 'generada' %}success{% elif orden.actualizar_estado == 'parcial' %}warning{% else %}secondary{% endif %}">
                                         {{ orden.get_estado_orden_display|default:orden.actualizar_estado|capfirst }}
                                     </span>
                                 </td>

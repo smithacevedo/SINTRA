@@ -67,6 +67,12 @@ def despacho_unificado(request, codigo_oc):
                     despacho=despacho
                 )
             
+            # Actualizar estado de la orden
+            nuevo_estado = orden.actualizar_estado
+            if orden.estado_orden != nuevo_estado:
+                orden.estado_orden = nuevo_estado
+                orden.save()
+            
             messages.success(request, f"Se realizaron {despachos_realizados} despachos correctamente. Remisión: {remision.numero_remision}")
     
     productos_pendientes = [p for p in orden.productos.all() if p.pendiente > 0]
@@ -85,6 +91,7 @@ def reintegrar_despacho(request, despacho_id):
     despacho = get_object_or_404(Despacho, id=despacho_id)
     
     if not despacho.reintegro:
+        orden = despacho.producto_solicitado.orden
         despacho.reintegro = True
         despacho.fecha_reintegro = timezone.now()
         despacho.save()
@@ -102,6 +109,12 @@ def reintegrar_despacho(request, despacho_id):
                 messages.success(request, f"Despacho de {despacho.cantidad} unidades reintegrado.")
         else:
             messages.success(request, f"Despacho de {despacho.cantidad} unidades reintegrado.")
+        
+        # Actualizar estado de la orden
+        nuevo_estado = orden.actualizar_estado
+        if orden.estado_orden != nuevo_estado:
+            orden.estado_orden = nuevo_estado
+            orden.save()
     else:
         messages.warning(request, "Este despacho ya fue reintegrado.")
     

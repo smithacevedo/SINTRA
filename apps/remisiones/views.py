@@ -86,6 +86,14 @@ def subir_factura(request, remision_id):
             remision.factura_nombre = archivo.name
             remision.estado_facturacion = 'cerrado'
             remision.save()
+            
+            # Actualizar estado de la orden
+            orden = remision.orden
+            nuevo_estado = orden.actualizar_estado
+            if orden.estado_orden != nuevo_estado:
+                orden.estado_orden = nuevo_estado
+                orden.save()
+            
             messages.success(request, 'Factura subida exitosamente')
         else:
             messages.error(request, 'No se seleccionó ningún archivo')
