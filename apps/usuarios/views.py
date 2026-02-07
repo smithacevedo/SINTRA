@@ -159,3 +159,22 @@ def cambiar_password_obligatorio(request):
             messages.error(request, 'Debe completar ambos campos.')
     
     return render(request, 'usuarios/cambiar_password.html')
+
+
+@requiere_permiso('editar_usuarios')
+def cambiar_clave_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+
+    if request.method == 'POST':
+        usuario.set_password('sintra123')
+        usuario.save()
+
+        # Marcar primer_acceso como True para que le pida cambiar contraseña
+        perfil, created = PerfilUsuario.objects.get_or_create(usuario=usuario)
+        perfil.primer_acceso = True
+        perfil.save()
+
+        messages.success(request, f'Contraseña de {usuario.username} reseteada a exitosamente.')
+        return redirect('lista_usuarios')
+
+    return redirect('lista_usuarios')

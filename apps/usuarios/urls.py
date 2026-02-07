@@ -7,4 +7,5 @@ urlpatterns = [
     path('editar/<int:usuario_id>/', views.editar_usuario, name='editar_usuario'),
     path('eliminar/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
     path('cambiar-password/', views.cambiar_password_obligatorio, name='cambiar_password_obligatorio'),
+    path('cambiar-clave/<int:usuario_id>/', views.cambiar_clave_usuario, name='cambiar_clave_usuario'),
 ]

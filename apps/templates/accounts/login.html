@@ -8,6 +8,15 @@
 {% block content %}
 
 
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+
   <div class="row" class="sidebar" data-color="purple">
     <div class="col-md-5">
       <div class="card">
