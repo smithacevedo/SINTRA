@@ -97,6 +97,15 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Talla <span style="color: red;">(*)</span></label>
+                                <input type="text" class="form-control" name="talla" value="{{ form.talla.value|default_if_none:'' }}" required>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary pull-right">Guardar</button>
                     <a href="{% url 'lista_productos' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
                     <div class="clearfix"></div>

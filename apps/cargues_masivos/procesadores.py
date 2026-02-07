@@ -347,13 +347,13 @@ def procesar_cargue_proveedores(archivo):
                     return resultados
 
                 if '-' not in nit:
-                    resultados['errores'].append(f"Fila {fila_num}: El NIT '{nit}' debe contener un guión (-)")
+                    resultados['errores'].append(f"Fila {fila_num}: El NIT '{nit}' debe contener un dígito de verificación (-)")
                     resultados['fallidos'] += 1
                     wb.close()
                     return resultados
                 partes_nit = nit.split('-')
                 if len(partes_nit) != 2 or not partes_nit[0].isdigit() or not partes_nit[1].isdigit():
-                    resultados['errores'].append(f"Fila {fila_num}: El NIT '{nit}' debe ser numérico en ambas partes separadas por guión")
+                    resultados['errores'].append(f"Fila {fila_num}: El NIT '{nit}' debe ser numérico con dígito de verificación (ejemplo: 12345678-9)")
                     resultados['fallidos'] += 1
                     wb.close()
                     return resultados

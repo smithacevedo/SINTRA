@@ -236,8 +236,8 @@ def descargar_remision_excel(request, remision_id):
         _write_cell(ws, r, 1, referencia)
         _write_cell(ws, r, 2, descripcion)
 
-        talla = ''
-        if referencia and '-' in referencia:
+        talla = getattr(getattr(prod_solic, 'producto', None), 'talla', '') or ''
+        if not talla and referencia and '-' in referencia:
             posible = referencia.split('-')[-1].strip()
             if posible:
                 talla = posible
@@ -391,8 +391,8 @@ def descargar_remision_pdf(request, remision_id):
         _write_cell(ws, r, 1, referencia)
         _write_cell(ws, r, 2, descripcion)
 
-        talla = ''
-        if referencia and '-' in referencia:
+        talla = getattr(getattr(prod_solic, 'producto', None), 'talla', '') or ''
+        if not talla and referencia and '-' in referencia:
             posible = referencia.split('-')[-1].strip()
             if posible:
                 talla = posible
