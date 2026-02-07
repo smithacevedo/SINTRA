@@ -46,7 +46,9 @@ def crear_usuario(request):
         
         if form.is_valid():
             try:
-                usuario = form.save()
+                usuario = form.save(commit=False)
+                usuario.set_password('sintra123')
+                usuario.save()
                 print(f"Usuario creado: {usuario.username}")  # Debug
                 
                 # Crear perfil de usuario
@@ -66,7 +68,7 @@ def crear_usuario(request):
                         except Rol.DoesNotExist:
                             print(f"Rol no encontrado: {rol_id}")  # Debug
                 
-                messages.success(request, 'Usuario creado exitosamente.')
+                messages.success(request, 'Usuario creado exitosamente. La clave de ingreso inicial es sintra123.')
                 return redirect('lista_usuarios')
             except Exception as e:
                 print(f"Error en creación: {str(e)}")  # Debug
@@ -138,6 +140,11 @@ def cambiar_password_obligatorio(request):
         if password1 and password2:
             if password1 == password2:
                 if len(password1) >= 8:
+                    tiene_mayuscula = any(c.isupper() for c in password1)
+                    tiene_especial = any(not c.isalnum() for c in password1)
+                    if not (tiene_mayuscula and tiene_especial):
+                        messages.error(request, 'La contraseña debe incluir al menos una mayúscula y un carácter especial.')
+                        return render(request, 'usuarios/cambiar_password.html')
                     request.user.set_password(password1)
                     request.user.save()
                     
@@ -152,7 +159,7 @@ def cambiar_password_obligatorio(request):
                     messages.success(request, 'Contraseña cambiada exitosamente.')
                     return redirect('home')
                 else:
-                    messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
+                    messages.error(request, 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un carácter especial.')
             else:
                 messages.error(request, 'Las contraseñas no coinciden.')
         else:
