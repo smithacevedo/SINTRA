@@ -10,7 +10,7 @@ class ProveedorForm(forms.ModelForm):
     def clean_nit(self):
         nit = self.cleaned_data.get('nit')
         if not nit or not re.fullmatch(r'\d+-\d+', nit):
-            raise forms.ValidationError("El NIT debe contener solo números y un guión obligatorio (ejemplo: 12345678-9).")
+            raise forms.ValidationError("El NIT debe contener solo números y un dígito de verificación, separados por un guión (ejemplo: 12345678-9).")
 
         qs = Proveedor.objects.filter(nit=nit)
         if self.instance.pk:
@@ -28,7 +28,7 @@ class ProveedorForm(forms.ModelForm):
 
     def clean_correo(self):
         correo = self.cleaned_data.get('correo')
-        if correo and "@" not in correo or "." not in correo:
+        if correo and ("@" not in correo or "." not in correo):
             raise forms.ValidationError("El correo debe contener un '@' y un '.'.")
         return correo
     
