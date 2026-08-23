@@ -533,6 +533,17 @@ def procesar_cargue_ordenes_compra(archivo):
                     wb.close()
                     return resultados
 
+                # H: TALLA
+                talla = None
+                if len(fila) > 7:
+                    talla = str(fila[7]).strip() if fila[7] else None
+
+                if not talla:
+                    resultados['errores'].append(f"Fila {fila_num}: Talla es obligatoria para OC '{codigo_oc}' producto '{referencia_producto}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
                 # Agrupar productos por orden de compra
                 if codigo_oc not in ordenes_dict:
                     ordenes_dict[codigo_oc] = {
@@ -544,6 +555,7 @@ def procesar_cargue_ordenes_compra(archivo):
 
                 ordenes_dict[codigo_oc]['productos'].append({
                     'producto': producto,
+                    'talla': talla,
                     'cantidad': cantidad,
                     'descripcion': descripcion
                 })
@@ -574,6 +586,7 @@ def procesar_cargue_ordenes_compra(archivo):
                     ProductoSolicitado.objects.create(
                         orden=orden,
                         producto=producto_data['producto'],
+                        talla=producto_data.get('talla'),
                         cantidad=producto_data['cantidad'],
                         descripcion=producto_data['descripcion']
                     )
@@ -656,6 +669,12 @@ def procesar_cargue_despachos(archivo, usuario=None):
                     producto_solicitado = ProductoSolicitado.objects.get(orden=orden, producto=producto)
                 except ProductoSolicitado.DoesNotExist:
                     resultados['errores'].append(f"Fila {fila_num}: El producto '{referencia}' no está registrado en la orden de compra '{codigo_oc}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+                except ProductoSolicitado.MultipleObjectsReturned:
+                    # Si existen varias líneas para el mismo producto (diferentes tallas), requerir la talla en el archivo
+                    resultados['errores'].append(f"Fila {fila_num}: La orden '{codigo_oc}' contiene varias tallas para el producto '{referencia}'. Incluye la talla en el archivo de despachos para poder asociar correctamente el despacho.")
                     resultados['fallidos'] += 1
                     wb.close()
                     return resultados

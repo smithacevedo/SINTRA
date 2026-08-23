@@ -46,6 +46,7 @@ class OrdenCompra(models.Model):
 class ProductoSolicitado(models.Model):
     orden = models.ForeignKey('OrdenCompra', on_delete=models.CASCADE, related_name='productos')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    talla = models.CharField(max_length=10)
     cantidad = models.PositiveIntegerField()
     descripcion = models.TextField(blank=True, null=True)
 

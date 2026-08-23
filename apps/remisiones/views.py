@@ -235,13 +235,7 @@ def descargar_remision_excel(request, remision_id):
         descripcion = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
         _write_cell(ws, r, 1, referencia)
         _write_cell(ws, r, 2, descripcion)
-
-        talla = getattr(getattr(prod_solic, 'producto', None), 'talla', '') or ''
-        if not talla and referencia and '-' in referencia:
-            posible = referencia.split('-')[-1].strip()
-            if posible:
-                talla = posible
-
+        talla = getattr(prod_solic, 'talla', '') or ''
         _write_cell(ws, r, 4, talla)
 
         _write_cell(ws, r, 5, getattr(prod_solic, 'cantidad', ''))
@@ -391,12 +385,8 @@ def descargar_remision_pdf(request, remision_id):
         _write_cell(ws, r, 1, referencia)
         _write_cell(ws, r, 2, descripcion)
 
-        talla = getattr(getattr(prod_solic, 'producto', None), 'talla', '') or ''
-        if not talla and referencia and '-' in referencia:
-            posible = referencia.split('-')[-1].strip()
-            if posible:
-                talla = posible
-
+        # La talla debe venir exclusivamente desde ProductoSolicitado
+        talla = getattr(prod_solic, 'talla', '') or ''
         _write_cell(ws, r, 4, talla)
 
         _write_cell(ws, r, 5, getattr(prod_solic, 'cantidad', ''))
