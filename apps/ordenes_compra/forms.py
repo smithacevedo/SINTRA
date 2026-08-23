@@ -38,9 +38,10 @@ class OrdenCompraForm(forms.ModelForm):
 class ProductoSolicitadoForm(forms.ModelForm):
     class Meta:
         model = ProductoSolicitado
-        fields = ['producto', 'cantidad', 'descripcion']
+        fields = ['producto', 'talla', 'cantidad', 'descripcion']
         widgets = {
             'producto': forms.Select(attrs={'class': 'form-control select2', 'required': True}),
+            'talla': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'required': True}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
         }

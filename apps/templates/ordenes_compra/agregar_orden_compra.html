@@ -93,6 +93,12 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label>Talla <span style="color: red;">(*)</span></label>
+                                    {{ f.talla }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
                                     <label>Cantidad <span style="color: red;">(*)</span></label>
                                     {{ f.cantidad }}
                                 </div>
@@ -119,6 +125,12 @@
                                 <div class="form-group">
                                     <label class="bmd-label-floating">Producto <span style="color: red;">(*)</span></label>
                                     {{ formset.empty_form.producto}}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Talla <span style="color: red;">(*)</span></label>
+                                    {{ formset.empty_form.talla }}
                                 </div>
                             </div>
                             <div class="col-md-6">
