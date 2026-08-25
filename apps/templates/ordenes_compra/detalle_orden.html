@@ -60,7 +60,7 @@
                                 <thead class="text-primary">
                                     <tr>
                                         <th>Referencia</th>
-                                        <th>Descripción</th>
+                                        <th>Observación</th>
                                         <th>Solicitado</th>
                                         <th>Despachado</th>
                                         <th>Pendiente</th>
@@ -69,8 +69,8 @@
                                 <tbody>
                                     {% for producto in productos %}
                                     <tr>
-                                        <td>{{ producto.producto.referencia }}</td>
-                                        <td>{{ producto.producto.descripcion }}</td>
+                                        <td>{{ producto.producto.referencia }}-{{ producto.talla }}</td>
+                                        <td>{{ producto.descripcion }}</td>
                                         <td>
                                             <span class="badge badge-info">{{ producto.cantidad }}</span>
                                         </td>

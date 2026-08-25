@@ -30,6 +30,7 @@
                             <tr>
                                 <th>Producto</th>
                                 <th>Referencia</th>
+                                <th>Observación</th>
                                 <th>Cantidad Despachada</th>
                                 <th>Fecha Despacho</th>
                             </tr>
@@ -38,7 +39,8 @@
                             {% for detalle in detalles %}
                             <tr>
                                 <td>{{ detalle.despacho.producto_solicitado.producto.articulo }}</td>
-                                <td><strong>{{ detalle.despacho.producto_solicitado.producto.referencia }}</strong></td>
+                                <td><strong>{{ detalle.despacho.producto_solicitado.producto.referencia }} - {{ detalle.despacho.producto_solicitado.descripcion }}</strong></td>
+                                <td>{{ detalle.despacho.producto_solicitado.descripcion }}</td>
                                 <td>
                                     <span class="badge badge-success">{{ detalle.despacho.cantidad }}</span>
                                 </td>

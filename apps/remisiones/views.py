@@ -232,7 +232,7 @@ def descargar_remision_excel(request, remision_id):
         d = det.despacho
         prod_solic = getattr(d, 'producto_solicitado', None)
         referencia = getattr(getattr(prod_solic, 'producto', None), 'referencia', '')
-        descripcion = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
+        descripcion = getattr(prod_solic, 'descripcion', '')
         _write_cell(ws, r, 1, referencia)
         _write_cell(ws, r, 2, descripcion)
         talla = getattr(prod_solic, 'talla', '') or ''
@@ -248,8 +248,10 @@ def descargar_remision_excel(request, remision_id):
         for prod_solic in remision.orden.productos.all():
             if prod_solic.pendiente > 0:
                 ref = getattr(getattr(prod_solic, 'producto', None), 'referencia', 'N/A')
-                desc = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
-                productos_pendientes.append(f"REF: {ref} | DESC: {desc} | PENDIENTE: {prod_solic.pendiente}")
+                talla = getattr(prod_solic, 'talla', '') or ''
+                ref_with_talla = f"{ref}-{talla}" if talla else ref
+                desc = getattr(prod_solic, 'descripcion', '')
+                productos_pendientes.append(f"REF: {ref_with_talla} | DESC: {desc} | PENDIENTE: {prod_solic.pendiente}")
 
         if productos_pendientes:
             resumen = "PENDIENTE POR DESPACHAR:\n" + "\n".join(productos_pendientes)
@@ -381,7 +383,7 @@ def descargar_remision_pdf(request, remision_id):
         d = det.despacho
         prod_solic = getattr(d, 'producto_solicitado', None)
         referencia = getattr(getattr(prod_solic, 'producto', None), 'referencia', '')
-        descripcion = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
+        descripcion = getattr(prod_solic, 'descripcion', '')
         _write_cell(ws, r, 1, referencia)
         _write_cell(ws, r, 2, descripcion)
 
@@ -413,8 +415,10 @@ def descargar_remision_pdf(request, remision_id):
         for prod_solic in remision.orden.productos.all():
             if prod_solic.pendiente > 0:
                 ref = getattr(getattr(prod_solic, 'producto', None), 'referencia', 'N/A')
-                desc = getattr(prod_solic, 'descripcion', '') or getattr(getattr(prod_solic, 'producto', None), 'descripcion', '') or ''
-                productos_pendientes.append(f"REF: {ref} | DESC: {desc} | PENDIENTE: {prod_solic.pendiente}")
+                talla = getattr(prod_solic, 'talla', '') or ''
+                ref_with_talla = f"{ref}-{talla}" if talla else ref
+                desc = getattr(prod_solic, 'descripcion', '')
+                productos_pendientes.append(f"REF: {ref_with_talla} | DESC: {desc} | PENDIENTE: {prod_solic.pendiente}")
 
         if productos_pendientes:
             resumen = "PENDIENTE POR DESPACHAR:\n" + "\n".join(productos_pendientes)
