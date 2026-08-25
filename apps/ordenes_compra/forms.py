@@ -1,6 +1,12 @@
 from django import forms
+from django.forms import inlineformset_factory, ModelChoiceField
 from .models import OrdenCompra, ProductoSolicitado
-from django.forms import inlineformset_factory
+from apps.productos.models import Producto
+
+
+class ProductoLabelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{getattr(obj, 'referencia', '')} - {getattr(obj, 'descripcion', '')}"
 
 class OrdenCompraForm(forms.ModelForm):
     class Meta:
@@ -45,6 +51,13 @@ class ProductoSolicitadoForm(forms.ModelForm):
             'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'required': True}),
             'descripcion': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['producto'] = ProductoLabelChoiceField(
+            queryset=Producto.objects.all(),
+            widget=forms.Select(attrs={'class': 'form-control select2', 'required': True}),
+        )
 
 # Formset para múltiples productos en una orden
 ProductoFormSet = inlineformset_factory(

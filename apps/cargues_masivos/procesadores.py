@@ -665,16 +665,23 @@ def procesar_cargue_despachos(archivo, usuario=None):
                     wb.close()
                     return resultados
 
+                # F: TALLA (columna F, índice 5) - obligatoria ahora
+                talla = str(fila[5]).strip() if len(fila) > 5 and fila[5] else None
+                if not talla:
+                    resultados['errores'].append(f"Fila {fila_num}: Talla (columna F) es obligatoria para OC '{codigo_oc}' referencia '{referencia}'")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
                 try:
-                    producto_solicitado = ProductoSolicitado.objects.get(orden=orden, producto=producto)
+                    producto_solicitado = ProductoSolicitado.objects.get(orden=orden, producto=producto, talla__iexact=talla)
                 except ProductoSolicitado.DoesNotExist:
-                    resultados['errores'].append(f"Fila {fila_num}: El producto '{referencia}' no está registrado en la orden de compra '{codigo_oc}'")
+                    resultados['errores'].append(f"Fila {fila_num}: El producto '{referencia}' con talla '{talla}' no está registrado en la orden de compra '{codigo_oc}'")
                     resultados['fallidos'] += 1
                     wb.close()
                     return resultados
                 except ProductoSolicitado.MultipleObjectsReturned:
-                    # Si existen varias líneas para el mismo producto (diferentes tallas), requerir la talla en el archivo
-                    resultados['errores'].append(f"Fila {fila_num}: La orden '{codigo_oc}' contiene varias tallas para el producto '{referencia}'. Incluye la talla en el archivo de despachos para poder asociar correctamente el despacho.")
+                    resultados['errores'].append(f"Fila {fila_num}: Ambigüedad: existen varias líneas solicitadas para '{referencia}-{talla}' en la orden '{codigo_oc}'")
                     resultados['fallidos'] += 1
                     wb.close()
                     return resultados

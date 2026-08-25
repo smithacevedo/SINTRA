@@ -35,6 +35,7 @@
                                         <input type="checkbox" id="selectAll" style="transform: scale(1.2);">
                                     </th>
                                     <th>Referencia</th>
+                                    <th>Observación</th>
                                     <th>Solicitado</th>
                                     <th>Despachado</th>
                                     <th>Pendiente</th>
@@ -51,7 +52,8 @@
                                                class="producto-checkbox" 
                                                style="transform: scale(1.2);">
                                     </td>
-                                    <td><strong>{{ producto.producto.referencia }}</strong></td>
+                                    <td><strong>{{ producto.producto.referencia }}-{{ producto.talla }}</strong></td>
+                                    <td>{{ producto.descripcion }}</td>
                                     <td>{{ producto.cantidad }}</td>
                                     <td>{{ producto.despachado }}</td>
                                     <td><span class="badge badge-warning">{{ producto.pendiente }}</span></td>
@@ -91,9 +93,10 @@
                 {% if productos_despachados %}
                 <div class="table-responsive">
                     <table class="table table-striped">
-                        <thead>
+                                <thead>
                             <tr>
                                 <th>Referencia</th>
+                                <th>Observación</th>
                                 <th>Solicitado</th>
                                 <th>Despachado</th>
                                 <th>Pendiente</th>
@@ -104,7 +107,8 @@
                         <tbody>
                             {% for producto in productos_despachados %}
                             <tr>
-                                <td><strong>{{ producto.producto.referencia }}</strong></td>
+                                <td><strong>{{ producto.producto.referencia }}-{{ producto.talla }}</strong></td>
+                                <td>{{ producto.descripcion }}</td>
                                 <td>{{ producto.cantidad }}</td>
                                 <td><span class="badge badge-success">{{ producto.despachado }}</span></td>
                                 <td>
@@ -161,8 +165,8 @@
                                                             </td>
                                                             <td>
                                                                 {% if not despacho.reintegro %}
-                                                                <button type="button" class="btn btn-sm btn-warning" 
-                                                                        onclick="confirmarReintegro({{ despacho.id }})">
+                                                                <button type="button" class="btn btn-sm btn-warning reintegro-btn"
+                                                                        data-despacho-id="{{ despacho.id }}">
                                                                     <i class="material-icons" style="font-size: 16px;">undo</i>
                                                                 </button>
                                                                 {% else %}
@@ -382,5 +386,13 @@ function ejecutarReintegro() {
     const despachoId = document.getElementById('reintegroId').value;
     window.location.href = `/despachos/reintegrar/${despachoId}/`;
 }
+
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest && e.target.closest('.reintegro-btn');
+    if (btn) {
+        const despachoId = btn.dataset.despachoId;
+        confirmarReintegro(despachoId);
+    }
+});
 </script>
 {% endblock %}
