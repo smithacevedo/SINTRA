@@ -12,7 +12,7 @@ class OrdenCompra(models.Model):
         ('finalizada', 'Finalizada'),
     ]
     
-    codigo_oc = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    codigo_oc = models.CharField(max_length=100, unique=True, blank=True, null=True)
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE, related_name='ordenes')
     proyecto = models.ForeignKey(Proyectos, on_delete=models.CASCADE, related_name='ordenes', blank=True, null=True)
     fecha_solicitud = models.DateField(default=timezone.now)
