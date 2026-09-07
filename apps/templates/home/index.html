@@ -7,7 +7,7 @@
 {% if messages %}
   {% for message in messages %}
     <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert" style="display: none;">
-      {{ message }}
+      {{ message|safe }}
     </div>
   {% endfor %}
 {% endif %}
@@ -280,15 +280,6 @@
                 </tbody>
               </table>
             </div>
-            
-            {% if ordenes_pendientes_count > 10 %}
-            <div class="alert alert-info mt-3">
-              <strong>Nota:</strong> Se muestran solo las primeras 10 órdenes. 
-              <a href="{% url 'buscar_orden' %}" class="btn btn-sm btn-info ml-2">
-                <i class="material-icons">view_list</i> Ver Todas
-              </a>
-            </div>
-            {% endif %}
           </div>
         </div>
       </div>
