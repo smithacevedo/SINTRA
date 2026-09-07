@@ -135,11 +135,17 @@ def editar_usuario(request, usuario_id):
 @requiere_permiso('eliminar_usuarios')
 def eliminar_usuario(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
+    # No permitir eliminar superusuarios
+    if usuario.is_superuser:
+        messages.error(request, 'No puedes eliminar un superusuario.')
+        return redirect('lista_usuarios')
+
     if usuario != request.user:  # No permitir eliminar el usuario actual
         usuario.delete()
         messages.success(request, 'Usuario eliminado exitosamente.')
     else:
         messages.error(request, 'No puedes eliminar tu propio usuario.')
+
     return redirect('lista_usuarios')
 
 
@@ -185,6 +191,11 @@ def cambiar_clave_usuario(request, usuario_id):
     usuario = get_object_or_404(User, id=usuario_id)
 
     if request.method == 'POST':
+        # Solo permitir que un superusuario cambie la contraseña de otro superusuario
+        if usuario.is_superuser and not request.user.is_superuser:
+            messages.error(request, 'Solo los superusuarios pueden cambiar la contraseña de otros superusuarios.')
+            return redirect('lista_usuarios')
+
         usuario.set_password('sintra123')
         usuario.save()
 

@@ -8,7 +8,8 @@ class PrimerAccesoMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated and not request.user.is_superuser:
+        # Verificar primer acceso para todos los usuarios autenticados (incluye superusuarios)
+        if request.user.is_authenticated:
             # Verificar si es primer acceso
             try:
                 perfil = PerfilUsuario.objects.get(usuario=request.user)
