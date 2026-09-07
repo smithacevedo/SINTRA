@@ -90,21 +90,25 @@
                                         <i class="material-icons">edit</i>
                                     </a>
                                     {% endif %}
-                                    {% if 'eliminar_usuarios' in permisos_usuario and not solo_lectura and usuario != request.user %}
-                                    <a href="{% url 'eliminar_usuario' usuario.id %}" 
-                                       class="btn btn-sm btn-danger"
-                                       onclick="return confirm('¿Está seguro de eliminar este usuario?')">
-                                        <i class="material-icons">delete</i>
-                                    </a>
+                                    {% if 'eliminar_usuarios' in permisos_usuario and not solo_lectura %}
+                                        {% if usuario != request.user and not usuario.is_superuser %}
+                                            <a href="{% url 'eliminar_usuario' usuario.id %}" 
+                                               class="btn btn-sm btn-danger"
+                                               onclick="return confirm('¿Está seguro de eliminar este usuario?')">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                     {% if solo_lectura %}
                                     <span class="text-muted">Solo lectura</span>
                                     {% endif %}
 
                                     {% if 'editar_usuarios' in permisos_usuario and not solo_lectura %}
-                                    <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#confirmChangePasswordModal{{ usuario.id }}">
-                                        <i class="material-icons text-white">vpn_key</i>
-                                    </button>
+                                        {% if not usuario.is_superuser or request.user.is_superuser %}
+                                            <button type="button" class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#confirmChangePasswordModal{{ usuario.id }}">
+                                                <i class="material-icons text-white">vpn_key</i>
+                                            </button>
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>
@@ -126,26 +130,28 @@
                 <!-- Modales de confirmación para cambiar contraseña -->
                 {% if usuarios %}
                 {% for usuario in usuarios %}
-                <div class="modal fade" id="confirmChangePasswordModal{{ usuario.id }}" tabindex="-1" aria-labelledby="confirmChangePasswordModalLabel{{ usuario.id }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="confirmChangePasswordModalLabel{{ usuario.id }}">Cambiar Contraseña </h5>
-                            </div>
-                            <div class="modal-body">
-                                <p>Al confirmar, la contraseña de <strong>{{ usuario.username }}</strong> se reseteará a <strong>sintra123</strong>.</p>
-                                <p>El usuario deberá cambiarla en su próximo acceso al sistema.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <form method="post" action="{% url 'cambiar_clave_usuario' usuario.id %}" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-primary">Confirmar</button>
-                                </form>
+                    {% if not usuario.is_superuser or request.user.is_superuser %}
+                    <div class="modal fade" id="confirmChangePasswordModal{{ usuario.id }}" tabindex="-1" aria-labelledby="confirmChangePasswordModalLabel{{ usuario.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmChangePasswordModalLabel{{ usuario.id }}">Cambiar Contraseña </h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Al confirmar, la contraseña de <strong>{{ usuario.username }}</strong> se reseteará a <strong>sintra123</strong>.</p>
+                                    <p>El usuario deberá cambiarla en su próximo acceso al sistema.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <form method="post" action="{% url 'cambiar_clave_usuario' usuario.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary">Confirmar</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% endfor %}
                 {% endif %}
                 
