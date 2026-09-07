@@ -16,6 +16,12 @@ class ListaProductosView(ListView):
     context_object_name = 'productos'
     paginate_by = 15
     
+    def get_queryset(self):
+        qs = super().get_queryset()
+        referencia = self.request.GET.get('referencia')
+        if referencia:
+            qs = qs.filter(referencia__icontains=referencia)
+        return qs
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -27,6 +33,8 @@ class ListaProductosView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['segment'] = 'productos'
+        # Preserve search query to populate the search field in the template
+        context['query_referencia'] = self.request.GET.get('referencia', '')
         # Solo lectura si solo tiene permiso de ver
         context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_productos') or 
                                       tiene_permiso(self.request.user, 'editar_productos') or 

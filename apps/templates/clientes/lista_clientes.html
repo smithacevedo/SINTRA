@@ -31,6 +31,14 @@
                 {% endif %}
             </div>
             <div class="card-body">
+                <form method="get" class="mb-3">
+                    <input type="text" name="nombre" id="input-nombre" class="form-control" placeholder="Buscar por nombre cliente" value="{{ query_nombre|default_if_none:'' }}">
+                    <div class="mt-2 d-flex gap-2">
+                        <button class="btn btn-primary" type="submit"><i class="material-icons">search</i> Filtrar</button>
+                        <a href="{% url 'lista_clientes' %}" class="btn btn-secondary"><i class="material-icons">clear</i> Limpiar</a>
+                    </div>
+                </form>
+
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="text-primary">
@@ -97,13 +105,25 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="7" class="text-center">No hay clientes disponibles.</td>
+                                <td colspan="7" class="text-center">
+                                    {% if query_nombre %}
+                                        No se encontraron resultados con "{{ query_nombre }}".
+                                    {% else %}
+                                        No hay clientes disponibles.
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 
+                {% if clientes|length == 0 %}
+                <div class="alert alert-info" role="alert" style="display: none;">
+                    No hay clientes disponibles.
+                </div>
+                {% endif %}
+
                 <!-- Paginación -->
                 {% include 'includes/pagination.html' %}
                 

@@ -21,7 +21,18 @@ def lista_usuarios(request):
     solo_lectura = not (tiene_permiso(request.user, 'crear_usuarios') or 
                        tiene_permiso(request.user, 'editar_usuarios') or 
                        tiene_permiso(request.user, 'eliminar_usuarios'))
-    usuarios = User.objects.all().order_by('username')
+
+    buscar = request.GET.get('buscar', '').strip()
+    usuarios_qs = User.objects.all()
+    if buscar:
+        from django.db.models import Q
+        usuarios_qs = usuarios_qs.filter(
+            Q(username__icontains=buscar) |
+            Q(first_name__icontains=buscar) |
+            Q(last_name__icontains=buscar) |
+            Q(email__icontains=buscar)
+        )
+    usuarios = usuarios_qs.order_by('username')
     
     paginator = Paginator(usuarios, 15)
     page_number = request.GET.get('page')
@@ -31,6 +42,7 @@ def lista_usuarios(request):
         'usuarios': page_obj,
         'page_obj': page_obj,
         'solo_lectura': solo_lectura,
+        'buscar': buscar,
         'segment': 'usuarios'
     })
 

@@ -23,15 +23,13 @@ from openpyxl.worksheet.page import PageMargins
 @requiere_permiso('ver_remisiones')
 def lista_remisiones(request):
     buscar = request.GET.get('buscar', '')
-    estado_facturacion = request.GET.get('estado_facturacion', '')
     
     remisiones = Remision.objects.all()
     
     if buscar:
         remisiones = remisiones.filter(numero_remision__icontains=buscar)
     
-    if estado_facturacion:
-        remisiones = remisiones.filter(estado_facturacion=estado_facturacion)
+    # Nota: se quitó el filtrado por estado_facturacion según solicitud
     
     remisiones = remisiones.order_by('-fecha_remision')
     
@@ -43,7 +41,6 @@ def lista_remisiones(request):
         'remisiones': page_obj,
         'page_obj': page_obj,
         'buscar': buscar,
-        'estado_facturacion': estado_facturacion,
         'segment': 'remisiones'
     })
 

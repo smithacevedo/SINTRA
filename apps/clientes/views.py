@@ -16,6 +16,13 @@ class ListaClientesView(ListView):
     context_object_name = 'clientes'
     paginate_by = 15
     
+    def get_queryset(self):
+        qs = super().get_queryset()
+        nombre = self.request.GET.get('nombre')
+        if nombre:
+            qs = qs.filter(nombre_cliente__icontains=nombre)
+        return qs
+    
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -27,6 +34,7 @@ class ListaClientesView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['segment'] = 'clientes'
+        context['query_nombre'] = self.request.GET.get('nombre', '')
         context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_clientes') or 
                                       tiene_permiso(self.request.user, 'editar_clientes') or 
                                       tiene_permiso(self.request.user, 'eliminar_clientes'))

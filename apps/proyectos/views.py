@@ -16,6 +16,13 @@ class ListaProyectosView(ListView):
     context_object_name = 'proyectos'
     paginate_by = 15
     
+    def get_queryset(self):
+        qs = super().get_queryset()
+        nombre = self.request.GET.get('nombre')
+        if nombre:
+            qs = qs.filter(nombre_proyecto__icontains=nombre)
+        return qs
+    
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -27,6 +34,7 @@ class ListaProyectosView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['segment'] = 'proyectos'
+        context['query_nombre'] = self.request.GET.get('nombre', '')
         context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_productos') or 
                                       tiene_permiso(self.request.user, 'editar_productos') or 
                                       tiene_permiso(self.request.user, 'eliminar_productos'))
