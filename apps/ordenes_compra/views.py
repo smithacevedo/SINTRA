@@ -20,6 +20,13 @@ class ListaOrdenesCompraView(ListView):
     paginate_by = 15
     ordering = ['-fecha_solicitud']
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        codigo = self.request.GET.get('codigo')
+        if codigo:
+            qs = qs.filter(codigo_oc__icontains=codigo)
+        return qs
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
@@ -31,6 +38,7 @@ class ListaOrdenesCompraView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['segment'] = 'ordenes'
+        context['query_codigo'] = self.request.GET.get('codigo', '')
         context['solo_lectura'] = not (tiene_permiso(self.request.user, 'crear_pedidos') or 
                                       tiene_permiso(self.request.user, 'editar_pedidos') or 
                                       tiene_permiso(self.request.user, 'eliminar_pedidos'))

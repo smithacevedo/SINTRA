@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from .models import Permiso
+from django.db.models import Q
 from .forms import PermisoForm
 from apps.utils.permisos import requiere_permiso, tiene_permiso
 
@@ -16,7 +17,12 @@ def lista_permisos(request):
     solo_lectura = not (tiene_permiso(request.user, 'crear_permisos') or 
                        tiene_permiso(request.user, 'editar_permisos') or 
                        tiene_permiso(request.user, 'eliminar_permisos'))
-    permisos = Permiso.objects.all().order_by('id')
+
+    buscar = request.GET.get('buscar', '').strip()
+    permisos_qs = Permiso.objects.all()
+    if buscar:
+        permisos_qs = permisos_qs.filter(Q(nombre__icontains=buscar) | Q(llave__icontains=buscar))
+    permisos = permisos_qs.order_by('id')
     
     paginator = Paginator(permisos, 15)
     page_number = request.GET.get('page')
@@ -26,6 +32,7 @@ def lista_permisos(request):
         'permisos': page_obj,
         'page_obj': page_obj,
         'solo_lectura': solo_lectura,
+        'buscar': buscar,
         'segment': 'permisos'
     })
 

@@ -16,7 +16,12 @@ def lista_roles(request):
     solo_lectura = not (tiene_permiso(request.user, 'crear_roles') or 
                        tiene_permiso(request.user, 'editar_roles') or 
                        tiene_permiso(request.user, 'eliminar_roles'))
-    roles = Rol.objects.all().order_by('nombre')
+
+    buscar = request.GET.get('buscar', '').strip()
+    roles_qs = Rol.objects.all()
+    if buscar:
+        roles_qs = roles_qs.filter(nombre__icontains=buscar)
+    roles = roles_qs.order_by('nombre')
     
     paginator = Paginator(roles, 15)
     page_number = request.GET.get('page')
@@ -26,6 +31,7 @@ def lista_roles(request):
         'roles': page_obj,
         'page_obj': page_obj,
         'solo_lectura': solo_lectura,
+        'buscar': buscar,
         'segment': 'roles'
     })
 

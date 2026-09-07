@@ -19,20 +19,25 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header card-header-primary">
-                <h4 class="card-title">Administración de Usuarios</h4>
-                <p class="card-category">Gestionar usuarios del sistema</p>
+            <div class="card-header card-header-primary d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="card-title">Administración de Usuarios</h4>
+                    <p class="card-category">Gestionar usuarios del sistema</p>
+                </div>
+                {% if 'crear_usuarios' in permisos_usuario and not solo_lectura %}
+                <a href="{% url 'crear_usuario' %}" class="btn btn-secondary">Nuevo Usuario</a>
+                {% endif %}
             </div>
             <div class="card-body">
-                {% if 'crear_usuarios' in permisos_usuario and not solo_lectura %}
-                <div class="mb-3">
-                    <a href="{% url 'crear_usuario' %}" class="btn btn-primary">
-                        <i class="material-icons">person_add</i> Nuevo Usuario
-                    </a>
-                </div>
-                {% endif %}
 
-                {% if usuarios %}
+                <form method="get" class="mb-3">
+                    <input type="text" name="buscar" class="form-control" placeholder="Buscar por usuario, nombre o email" value="{{ buscar }}">
+                    <div class="mt-2 d-flex gap-2">
+                        <button class="btn btn-primary" type="submit"><i class="material-icons">search</i> Filtrar</button>
+                        <a href="{% url 'lista_usuarios' %}" class="btn btn-secondary"><i class="material-icons">clear</i> Limpiar</a>
+                    </div>
+                </form>
+
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -103,12 +108,23 @@
                                     {% endif %}
                                 </td>
                             </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    {% if buscar %}
+                                        No se encontraron resultados con "{{ buscar }}".
+                                    {% else %}
+                                        No hay usuarios registrados.
+                                    {% endif %}
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Modales de confirmación para cambiar contraseña -->
+                {% if usuarios %}
                 {% for usuario in usuarios %}
                 <div class="modal fade" id="confirmChangePasswordModal{{ usuario.id }}" tabindex="-1" aria-labelledby="confirmChangePasswordModalLabel{{ usuario.id }}" aria-hidden="true">
                     <div class="modal-dialog">
@@ -131,13 +147,14 @@
                     </div>
                 </div>
                 {% endfor %}
+                {% endif %}
                 
                 <!-- Paginación -->
                 {% include 'includes/pagination.html' %}
-                
-                {% else %}
-                <div class="alert alert-info">
-                    <i class="material-icons">info</i> No hay usuarios registrados.
+
+                {% if usuarios|length == 0 %}
+                <div class="alert alert-info" role="alert" style="display: none;">
+                    No hay usuarios disponibles.
                 </div>
                 {% endif %}
             </div>

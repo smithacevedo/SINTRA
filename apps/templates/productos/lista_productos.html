@@ -31,6 +31,14 @@
                 {% endif %}
             </div>
             <div class="card-body">
+                <form method="get" class="mb-3">
+                    <input type="text" name="referencia" id="input-referencia" class="form-control" placeholder="Buscar por referencia" value="{{ query_referencia|default_if_none:'' }}">
+                    <div class="mt-2 d-flex gap-2">
+                        <button class="btn btn-primary" type="submit"><i class="material-icons">search</i> Filtrar</button>
+                        <a href="{% url 'lista_productos' %}" class="btn btn-secondary"><i class="material-icons">clear</i> Limpiar</a>
+                    </div>
+                </form>
+
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="text-primary">
@@ -95,13 +103,25 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="8" class="text-center">No hay productos disponibles.</td>
+                                <td colspan="8" class="text-center">
+                                    {% if query_referencia %}
+                                        No se encontraron resultados con "{{ query_referencia }}".
+                                    {% else %}
+                                        No hay productos disponibles.
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 
+                {% if productos|length == 0 %}
+                <div class="alert alert-info" role="alert" style="display: none;">
+                    No hay productos disponibles.
+                </div>
+                {% endif %}
+
                 <!-- Paginación -->
                 {% include 'includes/pagination.html' %}
                 

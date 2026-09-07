@@ -20,37 +20,30 @@
                 <p class="card-category">Todas las remisiones generadas</p>
             </div>
             <div class="card-body">
-                <!-- Campo de búsqueda y filtros -->
+                <!-- Campo de búsqueda y filtros (ajustado) -->
                 <div class="row mb-3">
                     <div class="col-md-12">
-                        <form method="get" class="form-inline">
-                            <div class="input-group mr-3">
-                                <input type="text" name="buscar" class="form-control" 
-                                       style="width: 250px;" 
+                        <form method="get">
+                            <div class="mb-2">
+                                <input type="text" name="buscar" class="form-control w-100" 
                                        placeholder="Buscar por número de remisión..." 
                                        value="{{ buscar }}">
                             </div>
-                            <div class="form-group mr-3">
-                                <select name="estado_facturacion" class="form-control" 
-                                        style="background: #6c757d; color: white; border-radius: 5px; padding: 5px 10px;">
-                                    <option value="">Todos los estados</option>
-                                    <option value="pendiente" {% if estado_facturacion == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                                    <option value="cerrado" {% if estado_facturacion == 'cerrado' %}selected{% endif %}>Cerrado</option>
-                                </select>
+
+                            <div class="d-flex gap-2 align-items-center">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="material-icons">search</i> Filtrar
+                                    </button>
+                                    <a href="{% url 'lista_remisiones' %}" class="btn btn-secondary">
+                                        <i class="material-icons">clear</i> Limpiar
+                                    </a>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary mr-2">
-                                <i class="material-icons">search</i> Filtrar
-                            </button>
-                            {% if buscar or estado_facturacion %}
-                            <a href="{% url 'lista_remisiones' %}" class="btn btn-secondary">
-                                <i class="material-icons">clear</i> Limpiar
-                            </a>
-                            {% endif %}
                         </form>
                     </div>
                 </div>
                 
-                {% if remisiones %}
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -106,22 +99,27 @@
                                     </button>
                                 </td>
                             </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    {% if buscar %}
+                                        No se encontraron remisiones con "{{ buscar }}".
+                                    {% else %}
+                                        No hay remisiones registradas.
+                                    {% endif %}
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Paginación -->
                 {% include 'includes/pagination.html' %}
-                
-                {% else %}
-                <div class="alert alert-info">
-                    <i class="material-icons">info</i> 
-                    {% if buscar %}
-                        No se encontraron remisiones con "{{ buscar }}".
-                    {% else %}
-                        No hay remisiones registradas.
-                    {% endif %}
+
+                {% if remisiones|length == 0 %}
+                <div class="alert alert-info" role="alert" style="display: none;">
+                    No hay remisiones disponibles.
                 </div>
                 {% endif %}
             </div>
