@@ -92,6 +92,30 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check" style="margin-top: 2rem; padding-left: 1rem;">
+                                <label class="form-check-label">
+                                    <input type="hidden" name="referencia_externa" value="">
+                                    <input class="form-check-input" id="id_referencia_externa" type="checkbox" name="referencia_externa" value="1" {% if form.referencia_externa.value %}checked{% endif %}>
+                                    <span class="form-check-sign">
+                                        <span class="check"></span>
+                                    </span>
+                                    Referencia externa
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" id="container_proveedor" style="margin-top: 0.5rem;">
+                                <label class="bmd-label-floating">Proveedor</label>
+                                {{ form.proveedor }}
+                                {% for error in form.proveedor.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary pull-right">Guardar Cambios</button>
                     <a href="{% url 'lista_productos' %}" class="btn btn-secondary pull-right mr-2">Volver</a>
                     <div class="clearfix"></div>
@@ -113,6 +137,23 @@
             placeholder: "Seleccione una opción",
             allowClear: true
         });
+        // Toggle proveedor según referencia_externa
+        function toggleProveedor() {
+            const checkbox = document.getElementById('id_referencia_externa');
+            const proveedorSelect = $('select[name="proveedor"]');
+            if (!checkbox) return;
+            const enabled = checkbox.checked;
+            proveedorSelect.prop('disabled', !enabled).trigger('change.select2');
+            if (enabled) {
+                proveedorSelect.attr('required', 'required');
+                $('#container_proveedor').show();
+            } else {
+                proveedorSelect.removeAttr('required');
+                $('#container_proveedor').hide();
+            }
+        }
+        toggleProveedor();
+        $('#id_referencia_externa').on('change', toggleProveedor);
     });
 </script>
 {% endblock javascripts %}

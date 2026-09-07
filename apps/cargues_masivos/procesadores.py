@@ -43,6 +43,8 @@ def procesar_cargue_productos(archivo):
                 precio_venta = fila[3]
                 linea = str(fila[4]).strip().upper() if fila[4] else None
                 descripcion = str(fila[5]).strip() if fila[5] else None
+                referencia_externa_raw = str(fila[6]).strip().upper() if len(fila) > 6 and fila[6] is not None else None
+                proveedor_nombre = str(fila[7]).strip() if len(fila) > 7 and fila[7] is not None else None
 
                 if not referencia:
                     resultados['errores'].append(f"Fila {fila_num}: Referencia vacía")
@@ -56,17 +58,38 @@ def procesar_cargue_productos(archivo):
                     wb.close()
                     return resultados
 
-                if not linea:
-                    resultados['errores'].append(f"Fila {fila_num}: Línea vacía para referencia '{referencia}'")
-                    resultados['fallidos'] += 1
-                    wb.close()
-                    return resultados
+                # Línea ahora opcional en el cargue; si viene se validará más abajo
 
                 if not descripcion:
                     resultados['errores'].append(f"Fila {fila_num}: Descripción vacía para referencia '{referencia}'")
                     resultados['fallidos'] += 1
                     wb.close()
                     return resultados
+
+                if referencia_externa_raw not in ['SI', 'NO']:
+                    resultados['errores'].append(f"Fila {fila_num}: Valor de REFERENCIA EXTERNA inválido '{referencia_externa_raw}' (debe ser SI o NO)")
+                    resultados['fallidos'] += 1
+                    wb.close()
+                    return resultados
+
+                referencia_externa_bool = True if referencia_externa_raw == 'SI' else False
+
+                proveedor_obj = None
+                if referencia_externa_bool:
+                    # Cuando es referencia externa, el campo PROVEEDOR es obligatorio
+                    if not proveedor_nombre:
+                        resultados['errores'].append(f"Fila {fila_num}: Producto marcado como referencia externa pero el campo PROVEEDOR está vacío")
+                        resultados['fallidos'] += 1
+                        wb.close()
+                        return resultados
+
+                    proveedor_obj = Proveedor.objects.filter(nombre__iexact=proveedor_nombre).first()
+                    if not proveedor_obj:
+                        resultados['errores'].append(f"Fila {fila_num}: Proveedor '{proveedor_nombre}' no encontrado para referencia '{referencia}'")
+                        resultados['fallidos'] += 1
+                        wb.close()
+                        return resultados
+
 
                 if Producto.objects.filter(referencia=referencia).exists():
                     resultados['errores'].append(f"Fila {fila_num}: El producto con referencia '{referencia}' ya existe")
@@ -90,11 +113,12 @@ def procesar_cargue_productos(archivo):
                     return resultados
 
                 lineas_validas = ['HOMBRE', 'DAMA', 'UNISEX']
-                if linea not in lineas_validas:
-                    resultados['errores'].append(f"Fila {fila_num}: Línea '{linea}' no válida para {referencia}. Valores válidos: {', '.join(lineas_validas)}")
-                    resultados['fallidos'] += 1
-                    wb.close()
-                    return resultados
+                if linea:
+                    if linea not in lineas_validas:
+                        resultados['errores'].append(f"Fila {fila_num}: Línea '{linea}' no válida para {referencia}. Valores válidos: {', '.join(lineas_validas)}")
+                        resultados['fallidos'] += 1
+                        wb.close()
+                        return resultados
 
                 productos_a_crear.append(Producto(
                     referencia=referencia,
@@ -102,7 +126,9 @@ def procesar_cargue_productos(archivo):
                     precio_costo=precio_costo,
                     precio_venta=precio_venta,
                     linea=linea,
-                    descripcion=descripcion
+                    descripcion=descripcion,
+                    referencia_externa=referencia_externa_bool,
+                    proveedor=proveedor_obj
                 ))
 
             except Exception as e:
@@ -568,25 +594,37 @@ def procesar_cargue_ordenes_compra(archivo):
 
         with transaction.atomic():
             for codigo_oc, datos_orden in ordenes_dict.items():
-                # Verificar si la orden ya existe
-                if OrdenCompra.objects.filter(codigo_oc=codigo_oc).exists():
-                    resultados['errores'].append(f"La orden de compra '{codigo_oc}' ya existe en el sistema")
-                    resultados['fallidos'] += 1
-                    wb.close()
-                    return resultados
+                # Si la orden ya existe, obtenla y no cambies su fecha; sino créala
+                orden = OrdenCompra.objects.filter(codigo_oc=codigo_oc).first()
+                if orden:
+                    # Validar que ninguno de los (producto, talla) ya exista en la orden
+                    for producto_data in datos_orden['productos']:
+                        prod = producto_data['producto']
+                        talla = producto_data.get('talla')
+                        if ProductoSolicitado.objects.filter(orden=orden, producto=prod, talla__iexact=talla).exists():
+                            resultados['errores'].append(f"La orden '{codigo_oc}' ya contiene el producto '{prod.referencia}' con talla '{talla}'.")
+                            resultados['fallidos'] += 1
+                            wb.close()
+                            return resultados
+                else:
+                    orden = OrdenCompra.objects.create(
+                        codigo_oc=codigo_oc,
+                        cliente=datos_orden['cliente'],
+                        proyecto=datos_orden['proyecto'],
+                        fecha_solicitud=datos_orden['fecha_solicitud']
+                    )
 
-                orden = OrdenCompra.objects.create(
-                    codigo_oc=codigo_oc,
-                    cliente=datos_orden['cliente'],
-                    proyecto=datos_orden['proyecto'],
-                    fecha_solicitud=datos_orden['fecha_solicitud']
-                )
-
+                # Crear las líneas de productos solicitados (sólo las que no existan)
                 for producto_data in datos_orden['productos']:
+                    prod = producto_data['producto']
+                    talla = producto_data.get('talla')
+                    # Doble chequeo por seguridad — si ya existe, saltamos (aunque arriba abortamos si existía cualquiera)
+                    if ProductoSolicitado.objects.filter(orden=orden, producto=prod, talla__iexact=talla).exists():
+                        continue
                     ProductoSolicitado.objects.create(
                         orden=orden,
-                        producto=producto_data['producto'],
-                        talla=producto_data.get('talla'),
+                        producto=prod,
+                        talla=talla,
                         cantidad=producto_data['cantidad'],
                         descripcion=producto_data['descripcion']
                     )
